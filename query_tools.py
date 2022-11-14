@@ -4,7 +4,7 @@ def precedence(token):
     try:
         return __precedence[token]
     # cartch index out of range exception
-    except IndexError:
+    except KeyError:
         return -1
 
 def get_type_of_token(token):
