@@ -55,11 +55,16 @@ class BooleanModel():
         # gets all filepaths in the corpus
         for filepath in glob(self.corpus):
             # opens and reads all files
-            with open(filepath, "r", encoding="utf-8") as file:
-                text = file.read()
-
+            try:
+                with open(filepath, "r", encoding="utf-8") as file:
+                    text = file.read() 
+            except(IsADirectoryError):
+                continue
+            
             # remove all special characters
             text = self.clean_text(text)
+            
+            text = self.remove_digits(text)
 
             # tokenize the document text
             words = word_tokenize(text)
@@ -69,7 +74,7 @@ class BooleanModel():
                      for word in words if word not in self.stopwords]
 
             # stem words in document
-            words = [self.stemmer.stem(word) for word in words]
+            # words = [self.stemmer.stem(word) for word in words]
 
             # get a list of all the unique terms
             terms = self.remove_duplicates(words)
@@ -109,6 +114,7 @@ class BooleanModel():
         operands = []
 
         for token in tokenized_query:
+            print(operands)
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()
@@ -116,7 +122,7 @@ class BooleanModel():
                 result = self.__eval_operation(token, left_op, right_op)
                 operands.append(result)
             else:
-                token = self.stemmer.stem(token.lower())
+                # token = self.stemmer.stem(token.lower())
                 operands.append(self.__bitvector(token))
 
         if len(operands) != 1:
@@ -135,8 +141,7 @@ class BooleanModel():
         :param right: right operand
         :param op: operation to perform
         :returns: result of the operation
-        """
-
+        """ 
         if op == "&":
             return left & right
 
@@ -144,7 +149,7 @@ class BooleanModel():
             return left | right
 
         else:
-            return 0 
+            return 0
         
     def __bitvector(self,word):
         ''' make a bitvector from the word'''
@@ -195,7 +200,7 @@ class BooleanModel():
         ''' removes digits from text'''
 
         regex = re.compile(r"\d")
-        return regex.sub(regex, '', text)
+        return re.sub(regex, '', text)
 
     def clean_text(self, text):
         ''' removes special characters from text'''

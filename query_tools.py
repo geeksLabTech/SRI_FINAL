@@ -30,19 +30,23 @@ def infix_to_postfix(infix):
     stack = []
     postfix = []
     for token in infix:
+        print(token)
+        
         token_type = get_type_of_token(token)
-        if token_type == 4:
-            postfix.append(token)
-        elif token_type == 1:
+        if token_type == 1:
             stack.append(token)
+        
         elif token_type == 2:
-            while stack[-1] != '(':
+            while len(stack) > 0 and stack[-1] != '(' :
                 postfix.append(stack.pop())
             stack.pop()
         elif token_type == 3:
-            while stack and precedence(token) <= precedence(stack[-1]):
-                postfix.append(stack.pop())
+            while len(stack) > 0 and precedence(token) <= precedence(stack[-1]):
+                postfix.append(stack[-1])
             stack.append(token)
-    while stack:
+        else:
+            postfix.append(token)
+            
+    while len(stack) > 0:
         postfix.append(stack.pop())
     return postfix

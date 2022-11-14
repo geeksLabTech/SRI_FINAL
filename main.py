@@ -1,8 +1,9 @@
 from boolean_model import BooleanModel
 
 if __name__ == "__main__":
-    model = BooleanModel('./corpus/*', 'english')
-    # print(model.vocabulary)
-    while(True):
-        txt = input(">>> ")
-        print(model.query(txt))
+    model = BooleanModel('./corpus/soccer/*', 'english')
+    print(list(model.vocabulary)[-1])
+    # while(True):
+        # txt = input(">>> ")
+    # txt = "Karim & Benzema"
+    # print(model.query(txt))
