@@ -30,7 +30,8 @@ def infix_to_postfix(infix):
     stack = []
     postfix = []
     for token in infix:
-        print(token)
+
+        token = token.lower()
         
         token_type = get_type_of_token(token)
         if token_type == 1:
@@ -45,8 +46,8 @@ def infix_to_postfix(infix):
                 postfix.append(stack[-1])
             stack.append(token)
         else:
-            postfix.append(token)
-            
+            postfix.append(token) 
+                  
     while len(stack) > 0:
         postfix.append(stack.pop())
     return postfix

@@ -61,10 +61,14 @@ class BooleanModel():
             except(IsADirectoryError):
                 continue
             
+            # replace punctuation with spaces
+            text = re.sub(r"[^\w\s]", " ", text)
+            
             # remove all special characters
             text = self.clean_text(text)
-            
             text = self.remove_digits(text)
+            
+            # print(text)
 
             # tokenize the document text
             words = word_tokenize(text)
@@ -114,12 +118,12 @@ class BooleanModel():
         operands = []
 
         for token in tokenized_query:
-            print(operands)
+            
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()
 
-                result = self.__eval_operation(token, left_op, right_op)
+                result = self.__eval_operation(left_op, right_op, token)
                 operands.append(result)
             else:
                 # token = self.stemmer.stem(token.lower())
@@ -141,13 +145,12 @@ class BooleanModel():
         :param right: right operand
         :param op: operation to perform
         :returns: result of the operation
-        """ 
+        """
+        
         if op == "&":
             return left & right
-
         elif op == "|":
             return left | right
-
         else:
             return 0
         
@@ -199,11 +202,15 @@ class BooleanModel():
     def remove_digits(self, text):
         ''' removes digits from text'''
 
-        regex = re.compile(r"\d")
-        return re.sub(regex, '', text)
+        regex = re.compile(r"\d") 
+        # Replace and return
+        return re.sub(regex, "", text)
+
 
     def clean_text(self, text):
         ''' removes special characters from text'''
-
+        text = text.replace(",.;:", " ")  
+        # Regex pattern for a word
         regex = re.compile(r"[^a-zA-Z0-9\s]")
-        return re.sub(regex, '', text)
+        # Replace and return
+        return re.sub(regex, "", text)
