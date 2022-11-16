@@ -1,5 +1,10 @@
 # Proyecto Final de Sistemas de Recuperación de Información
 
+## Integrantes:
+- Javier A. Oramas Lopez C312
+- Lia Zerquera Ferrer C312
+- Daniel A. Cardenas Cabrera C311
+
 ## Escenario 1: Buscador de datasets de Kaggle con info sobre un jugador de Fútbol o un equipo de fútbol
 ### Modelo a utilizar: Modelo Booleano Clásico
 
@@ -13,3 +18,18 @@ Un ejemplo de consulta que se pudiera desear realizar sería obtener todos los d
 >>> messi & (arg | argentina)
 ['2021-2022 Football Player Stats.csv', 'Final-player.txt', 'FullData (1).csv', 'FullData.csv', 'players_15.csv', 'players_16.csv', 'players_17.csv', 'players_18.csv', 'players_19.csv', 'players_20.csv']
 ~~~
+
+### Ejecucion:
+Para la Ejecucion del modelo se debe contar con python 3.9, e instalar los paquetes designados en requirements.txt
+
+~~~bash
+pip install -r requirements.txt
+~~~
+
+Luego ejecutar main.py
+~~~bash
+python main.py
+~~~
+
+Nota: si los comandos anteriores dan error sustituir pip por pip3 y python por python3 respectivamente
+El proyecto ha sido probado en archlinux con python 3.9.7
