@@ -41,3 +41,6 @@ body {
     border: none;
     cursor: pointer;
   }
+  .container {
+    padding: 0px;
+  }

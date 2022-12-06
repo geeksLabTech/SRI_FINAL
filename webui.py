@@ -19,10 +19,9 @@ def search():
         
         if query_method == "boolean":
             res = boolean_model.query(query)
-        
         res = [(i,get_size(i)) for i in res]
-        return render_template('search.html', results=res, methods=methods)
-    return render_template('search.html', results=None, methods=methods)
+        return render_template('search.html', results=res, methods=methods, query=query)
+    return render_template('search.html', results=None, methods=methods, query=None)
      
 if __name__ == "__main__":
     app.run(debug=True)

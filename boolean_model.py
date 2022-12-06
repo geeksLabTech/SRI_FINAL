@@ -51,49 +51,75 @@ class BooleanModel():
 
     def __load_and_process_corpus(self):
         '''Load and process the corpus'''
-        doc_id = 1
+        # counter for the documents
+        if os.path.isfile(self.corpus+"doc_c.cache"):
+            with open(self.corpus+"doc_c.cache", "r") as f:
+                c_doc_id = int(f.read()) 
+        else:
+            c_doc_id = 0
+                
         # gets all filepaths in the corpus
         for filepath in glob(self.corpus):
+            # verify if the file has already been processed
+            if os.path.isfile(filepath+".cache"):
+                # load from cache
+                with open(filepath+".cache", "r") as f:
+                    text = f.read()
+                text = text.split()
+                doc_id = int(text[0])
+                terms = text[1:]
             # opens and reads all files
-            try:
-                with open(filepath, "r", encoding="utf-8") as file:
-                    text = file.read() 
-            except(IsADirectoryError):
-                continue
+            else:
+                try:
+                    with open(filepath, "r", encoding="utf-8") as file:
+                        if filepath.endswith(".cache"):
+                            continue
+                        text = file.read() 
+                except(IsADirectoryError):
+                    continue
+                
+                doc_id = c_doc_id
+                c_doc_id += 1
             
-            # replace punctuation with spaces
-            text = re.sub(r"[^\w\s]", " ", text)
-            
-            # remove all special characters
-            text = self.clean_text(text)
-            text = self.remove_digits(text)
-            
-            # print(text)
+                # replace punctuation with spaces
+                text = re.sub(r"[^\w\s]", " ", text)
+                
+                # remove all special characters
+                text = self.clean_text(text)
+                text = self.remove_digits(text)
+                
+                # print(text)
 
-            # tokenize the document text
-            words = word_tokenize(text)
+                # tokenize the document text
+                words = word_tokenize(text)
 
-            # remove stopwords from the text
-            words = [word.lower()
-                     for word in words if word not in self.stopwords]
+                # remove stopwords from the text
+                words = [word.lower()
+                        for word in words if word not in self.stopwords]
 
-            # stem words in document
-            # words = [self.stemmer.stem(word) for word in words]
+                # stem words in document
+                # words = [self.stemmer.stem(word) for word in words]
 
-            # get a list of all the unique terms
-            terms = self.remove_duplicates(words)
-
-            # add all terms to the postings list
+                # get a list of all the unique terms
+                terms = self.remove_duplicates(words)
+                
+                # write to cache
+                with open(filepath+".cache", "w") as f:
+                    f.write(str(doc_id) + " ")
+                    f.write(" ".join(terms))
+                # add all terms to the postings list
             for term in terms:
                 self.postings[term].append(doc_id)
 
             # add doc to documents list for later indexing
             self.documents[doc_id] = os.path.basename(filepath)
-
             # increment doc_id for the next doc
             doc_id += 1
         # vocabulary:list with all the postings keys
         self.vocabulary = self.postings.keys()
+        # write to doc_c.cache
+        with open(self.corpus+"doc_c.cache", "w") as f:
+            f.write(str(c_doc_id-1))
         return
 
     def query(self, query):
@@ -132,9 +158,8 @@ class BooleanModel():
         if len(operands) != 1:
             print("Malformed query or postfix expression")
             return list()
-
         # Find out documents corresponding to set bits in the vector
-        matching_docs = [self.documents[i + 1]
+        matching_docs = [self.documents[i]
                          for i in np.where(operands[0])[0]]
 
         return matching_docs
