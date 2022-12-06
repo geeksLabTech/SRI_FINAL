@@ -56,7 +56,7 @@ class BooleanModel():
             with open(self.corpus+"doc_c.cache", "r") as f:
                 c_doc_id = int(f.read()) 
         else:
-            c_doc_id = 0
+            c_doc_id = 1
                 
         # gets all filepaths in the corpus
         for filepath in glob(self.corpus):
@@ -159,7 +159,7 @@ class BooleanModel():
             print("Malformed query or postfix expression")
             return list()
         # Find out documents corresponding to set bits in the vector
-        matching_docs = [self.documents[i]
+        matching_docs = [self.documents[i+1]
                          for i in np.where(operands[0])[0]]
 
         return matching_docs
