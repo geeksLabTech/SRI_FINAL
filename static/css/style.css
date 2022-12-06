@@ -14,7 +14,7 @@ body {
   }
   form.example button {
     float: left;
-    width: 20%;
+    width: 10%;
     padding: 10px;
     background: #2196F3;
     color: white;
@@ -30,4 +30,14 @@ body {
     content: "";
     clear: both;
     display: table;
+  }
+  form.example select {
+    float: left;
+    width: 10%;
+    padding: 10px;
+    background: white;
+    color: #2196F3;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
   }
