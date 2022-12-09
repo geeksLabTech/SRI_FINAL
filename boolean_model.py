@@ -130,6 +130,15 @@ class BooleanModel():
 
         # tokenize query and convert to postfix
         tokenized_query = word_tokenize(query)
+        n_tokenized_query = [tokenized_query[0]]
+        for i in range(1,len(tokenized_query)):
+            if get_type_of_token(tokenized_query[i]) == 3:
+                if get_type_of_token(tokenized_query[i-1]) == 3:
+                    n_tokenized_query.append("&")
+                    n_tokenized_query.append(tokenized_query[i])
+                else:
+                    n_tokenized_query.append(tokenized_query[i])
+        tokenized_query = n_tokenized_query
         tokenized_query = infix_to_postfix(tokenized_query)
 
         # eval query and return relevant documents
@@ -149,6 +158,7 @@ class BooleanModel():
                 right_op = operands.pop()
                 left_op = operands.pop()
 
+                
                 result = self.__eval_operation(left_op, right_op, token)
                 operands.append(result)
             else:
