@@ -29,12 +29,12 @@ class InformationRetrievalSystem:
     def load_and_process_corpus(self, path):
         self.trie, self.documents = self.corpus_loader.load(path, self.trie, self.documents)
 
-    def process_query_with_vectorial_model(self, query: list[str]) -> list[str]:
+    def process_query_with_vectorial_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
         vectorial_model = VectorialModel(self.trie, self.documents)
         return vectorial_model.process_query(tokenized_query)
 
-    def process_query_with_boolean_model(self, query: list[str]) -> list[str]:
+    def process_query_with_boolean_model(self, query: str) -> list[str]:
         # TODO - update boolean model to use Trie and dict with DocumentData
         boolean_model = BooleanModel(self.trie, self.documents)
         tokenized_query = self.tokenizer.tokenize(query)

@@ -1,4 +1,4 @@
-import glob
+from glob import glob
 import os
 from document_data import DocumentData
 from tokenizer import Tokenizer

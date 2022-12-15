@@ -1,11 +1,11 @@
 
 from abc import ABC, abstractmethod
 import re
-import spacy 
-import stanza 
-import spacy_stanza
-from negspacy.negation import Negex
-from negspacy.termsets import termset 
+# import spacy 
+# import stanza 
+# import spacy_stanza
+# from negspacy.negation import Negex
+# from negspacy.termsets import termset 
 
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
@@ -52,13 +52,13 @@ class NltkTokenizer(Tokenizer):
         return re.sub(regex, "", text)
 
 
-# Ignore this class for now
-class SpacyTokenizer(Tokenizer):
-    def __init__(self, language) -> None:
-        self.nlp_model = spacy_stanza.load_pipeline('en')
+# # Ignore this class for now
+# class SpacyTokenizer(Tokenizer):
+#     def __init__(self, language) -> None:
+#         self.nlp_model = spacy_stanza.load_pipeline('en')
         
 
-    def tokenize(self, text: str) -> list:
-        return self.nlp_model(text)
+#     def tokenize(self, text: str) -> list:
+#         return self.nlp_model(text)
 
 
