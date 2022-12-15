@@ -1,18 +1,5 @@
-from io import TextIOWrapper
-import math
-import os
-import re
-from collections import defaultdict
-from glob import glob
 
-import numpy as np
-
-from nltk.corpus import stopwords
-from nltk.stem.snowball import SnowballStemmer
-from nltk.tokenize import word_tokenize
-
-from query_tools import get_type_of_token, infix_to_postfix
-from trie import Trie, TrieNode
+from trie import Trie
 from document_data import DocumentData
 from tokenizer import Tokenizer
 from corpus_loader import CorpusLoader
@@ -26,11 +13,15 @@ class InformationRetrievalSystem:
         self.tokenizer = tokenizer
         self.corpus_loader = CorpusLoader(tokenizer)
         
-    def load_and_process_corpus(self, path):
-        self.trie, self.documents = self.corpus_loader.load(path, self.trie, self.documents)
+    def load_and_process_corpus_from_path(self, path):
+        self.trie, self.documents = self.corpus_loader.load_from_path(path, self.trie, self.documents)
 
+    def load_and_process_corpus_from_ir_datasets(self, dataset: str):
+        self.trie, self.documents = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
+        
     def process_query_with_vectorial_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
+        # TODO - change to create VectorialModel only once
         vectorial_model = VectorialModel(self.trie, self.documents)
         return vectorial_model.process_query(tokenized_query)
 
