@@ -12,7 +12,7 @@ def home():
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     res = []
-    methods = ["boolean"]
+    methods = ["boolean", "vectorial", "fuzzy"]
     if request.method == "POST":
         query = request.form['search']
         if query == '':
