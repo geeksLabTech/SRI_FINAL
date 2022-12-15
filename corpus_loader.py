@@ -5,7 +5,6 @@ from tokenizer import Tokenizer
 from trie import Trie
 
 
-
 class CorpusLoader:
     def __init__(self, tokenizer: Tokenizer) -> None:
         self.tokenizer = tokenizer

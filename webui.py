@@ -15,8 +15,11 @@ def search():
     methods = ["boolean"]
     if request.method == "POST":
         query = request.form['search']
+        if query == '':
+            return render_template('search.html', results=None, methods=methods, query=None)
+
         query_method = request.form['method']
-        
+ 
         if query_method == "boolean":
             res = boolean_model.query(query)
         res = [(i,get_size(i)) for i in res]

@@ -11,7 +11,7 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
 
 from query_tools import get_type_of_token, infix_to_postfix
-
+from sympy import to_dnf
 
 class BooleanModel():
     '''Boolean Model class for information retrieval'''
@@ -48,7 +48,7 @@ class BooleanModel():
         self.vocabulary = set()
 
         self.__load_and_process_corpus()
-
+    
     def __load_and_process_corpus(self):
         '''Load and process the corpus'''
         # counter for the documents
@@ -129,18 +129,27 @@ class BooleanModel():
         '''
 
         # tokenize query and convert to postfix
+        print(query)
         tokenized_query = word_tokenize(query)
         n_tokenized_query = [tokenized_query[0]]
+        
         for i in range(1,len(tokenized_query)):
-            if get_type_of_token(tokenized_query[i]) == 3:
-                if get_type_of_token(tokenized_query[i-1]) == 3:
+            if get_type_of_token(tokenized_query[i-1]) == 4:
+                if get_type_of_token(tokenized_query[i]) == 4:
                     n_tokenized_query.append("&")
                     n_tokenized_query.append(tokenized_query[i])
                 else:
                     n_tokenized_query.append(tokenized_query[i])
-        tokenized_query = n_tokenized_query
-        tokenized_query = infix_to_postfix(tokenized_query)
-
+                continue
+            n_tokenized_query.append(tokenized_query[i])      
+                
+        query = " ".join(n_tokenized_query)
+        # print(query)
+        query = str(to_dnf(query)) 
+        t_query = word_tokenize(query)
+        print(t_query)
+        tokenized_query = infix_to_postfix(t_query)
+        print("eval query")
         # eval query and return relevant documents
         return self.__eval_query(tokenized_query)
 
@@ -153,7 +162,8 @@ class BooleanModel():
         operands = []
 
         for token in tokenized_query:
-            
+            print(token)
+            print()
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()
@@ -249,3 +259,4 @@ class BooleanModel():
         regex = re.compile(r"[^a-zA-Z0-9\s]")
         # Replace and return
         return re.sub(regex, "", text)
+
