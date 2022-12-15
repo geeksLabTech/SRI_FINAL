@@ -4,8 +4,8 @@ from trie import Trie
 class FuzzyModel(BooleanModel):
 
 
-    def __init__(self,path,language , trie: Trie):
-        super().__init__(path,language)
+    def __init__(self,trie: Trie , documents):
+        super().__init__(trie,documents)
         self.fuzzy = True
         self.trie = trie
     
