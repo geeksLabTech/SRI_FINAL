@@ -5,7 +5,7 @@ from tokenizer import Tokenizer
 from corpus_loader import CorpusLoader
 from vectorial_model import VectorialModel
 from boolean_model import BooleanModel
-
+from fuzzy_model import FuzzyModel
 class InformationRetrievalSystem:
     def __init__(self, tokenizer: Tokenizer) -> None:
         self.trie = Trie()
@@ -33,6 +33,11 @@ class InformationRetrievalSystem:
         # TODO - update boolean model to use tokenized query
         return boolean_model.query(tokenized_query)
 
+    def process_query_with_fuzzy_model(self,query: str) -> list[str]:
+        fuzzy_model = FuzzyModel(self.trie, self.documents)
+        tokenized_query = self.tokenizer.tokenize(query)
+
+        return fuzzy_model.query(tokenized_query)
     # def process_query_with_boolean_model(self, query: list[str]) -> list[str]:
     #     docs_by_token_matches: dict[str, list[int]] = {}
     #     for doc_id in self.documents:
