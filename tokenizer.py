@@ -47,7 +47,7 @@ class NltkTokenizer(Tokenizer):
         ''' removes special characters from text'''
         text = text.replace(",.;:", " ")  
         # Regex pattern for a word
-        regex = re.compile(r"[^\|\&\(\)a-zA-Z0-9\s]")
+        regex = re.compile(r"[^\|\&a-zA-Z0-9\s]")
         # Replace and return
         return re.sub(regex, "", text)
 

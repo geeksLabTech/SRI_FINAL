@@ -10,7 +10,7 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
 
 from query_tools import get_type_of_token, infix_to_postfix
-from sympy import to_dnf
+from sympy import to_dnf, Symbol
 
 
 class BooleanModel():
@@ -24,10 +24,11 @@ class BooleanModel():
         :param query: valid boolean expression to search for in the documents
         :returns: a list of all marching documents
         '''
+        # print("TOK:",tokenized_query)
         # tokenize query and convert to postfix
+        # query = self.clean_text(query)
         # tokenized_query = word_tokenize(query)
         n_tokenized_query = [tokenized_query[0]]
-        
         for i in range(1,len(tokenized_query)):
             if get_type_of_token(tokenized_query[i-1]) == 4:
                 if get_type_of_token(tokenized_query[i]) == 4:
@@ -38,15 +39,17 @@ class BooleanModel():
                 continue
             n_tokenized_query.append(tokenized_query[i])
 
-        
-        query = " ".join(n_tokenized_query)
-        
-        if '|' in query:
-            query = str(to_dnf(query))
-        t_query = word_tokenize(query)
+        # query = []
+        # for t in n_tokenized_query:
+        #     if get_type_of_token(t) != 3:
+        #         query.append(Symbol(t))
+        #     query.append(t)
+        # query = str(to_dnf(query))
+        # print(n_tokenized_query)
+        # t_query = word_tokenize(n_tokenized_query)
         # eval query and return relevant documents
         
-        return self.__eval_query(t_query)
+        return self.__eval_query(n_tokenized_query)
 
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
@@ -129,7 +132,7 @@ class BooleanModel():
         ''' removes special characters from text'''
         text = text.replace(",.;:", " ")  
         # Regex pattern for a word
-        regex = re.compile(r"[^a-zA-Z0-9\s]")
+        regex = re.compile(r"[^\|\&a-zA-Z0-9\s]")
         # Replace and return
         return re.sub(regex, "", text)
 
