@@ -28,6 +28,7 @@ class InformationRetrievalSystem:
     def process_query_with_boolean_model(self, query: str) -> list[str]:
         # TODO - update boolean model to use Trie and dict with DocumentData
         boolean_model = BooleanModel(self.trie, self.documents)
+        # print(self.documents)
         tokenized_query = self.tokenizer.tokenize(query)
 
         # TODO - update boolean model to use tokenized query

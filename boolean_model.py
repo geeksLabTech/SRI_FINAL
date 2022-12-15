@@ -11,8 +11,7 @@ from nltk.tokenize import word_tokenize
 
 from query_tools import get_type_of_token, infix_to_postfix
 from sympy import to_dnf
-import ir_datasets
-
+\
 
 class BooleanModel():
     '''Boolean Model class for information retrieval'''
@@ -20,15 +19,13 @@ class BooleanModel():
         self.trie = trie
         self.documents = documents
         
-    def query(self, query):
+    def query(self, tokenized_query):
         ''' query the corpus documents using a boolean model
         :param query: valid boolean expression to search for in the documents
         :returns: a list of all marching documents
         '''
-
         # tokenize query and convert to postfix
-        print(query)
-        tokenized_query = word_tokenize(query)
+        # tokenized_query = word_tokenize(query)
         n_tokenized_query = [tokenized_query[0]]
         
         for i in range(1,len(tokenized_query)):
@@ -39,11 +36,13 @@ class BooleanModel():
                 else:
                     n_tokenized_query.append(tokenized_query[i])
                 continue
-            n_tokenized_query.append(tokenized_query[i])      
-                
+            n_tokenized_query.append(tokenized_query[i])
+
         query = " ".join(n_tokenized_query)
         # print(query)
-        query = str(to_dnf(query)) 
+        # print(query)
+        if '|' in query:
+            query = str(to_dnf(query))
         t_query = word_tokenize(query)
         # eval query and return relevant documents
         return self.__eval_query(t_query)
@@ -105,9 +104,9 @@ class BooleanModel():
         
         if node:
             if negate:
-                relevant_docs = [ i for i in self.documents if node.frequency_by_document[i] == 0]
+                relevant_docs = [ i for i in self.documents if i in node.frequency_by_document and node.frequency_by_document[i] == 0]
             else:
-                relevant_docs = [ i for i in self.documents if node.frequency_by_document[i] != 0]
+                relevant_docs = [ i for i in self.documents if not i in node.frequency_by_document or node.frequency_by_document[i] != 0]
             return relevant_docs
         
         return []

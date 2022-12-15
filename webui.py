@@ -1,10 +1,20 @@
 from flask import Flask, request, render_template, redirect
 from boolean_model import BooleanModel
 from tools import get_size
+import ir_datasets
+from system import InformationRetrievalSystem
+from tokenizer import NltkTokenizer, Tokenizer
 
 # Flask app boilerplate
 app = Flask(__name__)
-boolean_model = BooleanModel('./static/corpus/*', 'english')
+
+tokenizer = NltkTokenizer('english')
+cranfield = ir_datasets.load('cranfield')
+queries = cranfield.queries_iter()
+sri = InformationRetrievalSystem(tokenizer=tokenizer)
+sri.load_and_process_corpus_from_ir_datasets('cranfield')
+
+# boolean_model = BooleanModel('./static/corpus/*', 'english')
 
 @app.route("/", methods = ["GET"])
 def home():
@@ -21,8 +31,8 @@ def search():
         query_method = request.form['method']
  
         if query_method == "boolean":
-            res = boolean_model.query(query)
-        res = [(i,get_size(i)) for i in res]
+            res = sri.process_query_with_boolean_model(query)
+            res = [(i,get_size(i)) for i in res]
         return render_template('search.html', results=res, methods=methods, query=query)
     return render_template('search.html', results=None, methods=methods, query=None)
      
