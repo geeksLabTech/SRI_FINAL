@@ -37,7 +37,7 @@ class CorpusLoader:
 
     def load_from_ir_datasets(self, dataset_name: str, trie: Trie, current_documents: dict[int, DocumentData]) -> tuple[Trie, dict[int, DocumentData]]:
         dataset = ir_datasets.load(dataset_name)
-        doc_id = len(current_documents) + 1
+        # doc_id = len(current_documents) + 1
         for doc in dataset.docs_iter():
             if doc.text == '':
                 print('empty doc', doc.doc_id)
@@ -48,7 +48,7 @@ class CorpusLoader:
             trie.insert_document(words, doc.doc_id)
             words_frequency = Counter(words)
             doc_data = DocumentData(doc.doc_id, len(words), max(words_frequency.values()))
-            current_documents[doc_id] = doc_data
-            doc_id += 1
+            current_documents[doc.doc_id] = doc_data
+            # doc_id += 1
         
         return trie, current_documents
