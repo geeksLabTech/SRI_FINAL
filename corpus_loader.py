@@ -9,7 +9,6 @@ import ir_datasets
 
 
 
-
 class CorpusLoader:
     def __init__(self, tokenizer: Tokenizer) -> None:
         self.tokenizer = tokenizer

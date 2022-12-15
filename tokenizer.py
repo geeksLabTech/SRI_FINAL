@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 import re
 # import spacy 
 # import stanza 
-# import spacy_stanza
-# from negspacy.negation import Negex
-# from negspacy.termsets import termset 
+# # import spacy_stanza
+# # from negspacy.negation import Negex
+# # from negspacy.termsets import termset 
 
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
@@ -52,7 +52,11 @@ class NltkTokenizer(Tokenizer):
         return re.sub(regex, "", text)
 
 
+<<<<<<< HEAD
 # # Ignore this class for now
+=======
+# Ignore this class for now
+>>>>>>> a090f2c (typos in tokinazer y changes in fuzzy model)
 # class SpacyTokenizer(Tokenizer):
 #     def __init__(self, language) -> None:
 #         self.nlp_model = spacy_stanza.load_pipeline('en')
