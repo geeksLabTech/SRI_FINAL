@@ -52,11 +52,7 @@ class NltkTokenizer(Tokenizer):
         return re.sub(regex, "", text)
 
 
-<<<<<<< HEAD
 # # Ignore this class for now
-=======
-# Ignore this class for now
->>>>>>> a090f2c (typos in tokinazer y changes in fuzzy model)
 # class SpacyTokenizer(Tokenizer):
 #     def __init__(self, language) -> None:
 #         self.nlp_model = spacy_stanza.load_pipeline('en')
