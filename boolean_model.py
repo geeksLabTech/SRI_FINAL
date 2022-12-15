@@ -11,7 +11,7 @@ from nltk.tokenize import word_tokenize
 
 from query_tools import get_type_of_token, infix_to_postfix
 from sympy import to_dnf
-\
+
 
 class BooleanModel():
     '''Boolean Model class for information retrieval'''
@@ -38,13 +38,14 @@ class BooleanModel():
                 continue
             n_tokenized_query.append(tokenized_query[i])
 
+        
         query = " ".join(n_tokenized_query)
-        # print(query)
-        # print(query)
+        
         if '|' in query:
             query = str(to_dnf(query))
         t_query = word_tokenize(query)
         # eval query and return relevant documents
+        
         return self.__eval_query(t_query)
 
     def __eval_query(self, tokenized_query):
@@ -84,9 +85,9 @@ class BooleanModel():
         """
         
         if op == "&":
-            return [ i for i in left if i in right]
+            return list(set(left).intersection(set(right)))
         elif op == "|":
-            return left + right
+            return list(set(left).union(set(right)))
         else:
             return []
         
