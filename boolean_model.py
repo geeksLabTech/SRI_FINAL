@@ -45,7 +45,7 @@ class BooleanModel():
             query = str(to_dnf(query))
         t_query = word_tokenize(query)
         # eval query and return relevant documents
-        
+        print(self.__eval_query(t_query), 'padreeee')
         return self.__eval_query(t_query)
 
     def __eval_query(self, tokenized_query):
