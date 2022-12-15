@@ -29,10 +29,14 @@ def search():
             return render_template('search.html', results=None, methods=methods, query=None)
 
         query_method = request.form['method']
- 
-        if query_method == "boolean":
-            res = sri.process_query_with_boolean_model(query)
-            res = [(i,get_size(i)) for i in res]
+
+        models = {
+            "boolean": sri.process_query_with_boolean_model, 
+            "vectorial": sri.process_query_with_vectorial_model,
+            "fuzzy": sri.process_query_with_fuzzy_model
+            }
+        res = models[query_method](query)
+        res = [(i,get_size(i)) for i in res]
         return render_template('search.html', results=res, methods=methods, query=query)
     return render_template('search.html', results=None, methods=methods, query=None)
      
