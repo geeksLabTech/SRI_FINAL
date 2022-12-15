@@ -45,7 +45,7 @@ class CorpusLoader:
 
             words = self.tokenizer.tokenize(doc.text)
             assert len(words) > 0
-            trie.insert_document(words, doc_id)
+            trie.insert_document(words, doc.doc_id)
             words_frequency = Counter(words)
             doc_data = DocumentData(doc.doc_id, len(words), max(words_frequency.values()))
             current_documents[doc_id] = doc_data
