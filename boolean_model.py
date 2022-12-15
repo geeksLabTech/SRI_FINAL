@@ -46,10 +46,10 @@ class BooleanModel():
         #     query.append(t)
         # query = str(to_dnf(query))
         # print(n_tokenized_query)
-        t_query = word_tokenize(n_tokenized_query)
+        # t_query = word_tokenize(n_tokenized_query)
         # eval query and return relevant documents
-        print(self.__eval_query(t_query), 'padreeee')
-        return self.__eval_query(t_query)
+        # print(self.__eval_query(n_tokenized_query), 'padreeee')
+        return self.__eval_query(n_tokenized_query)
 
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
