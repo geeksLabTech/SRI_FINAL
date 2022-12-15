@@ -1,22 +1,31 @@
+from boolean_model import BooleanModel
+from sympy import to_dnf, sympify
+
+class FuzzyModel(BooleanModel):
 
 
-def convert_DNF_to_CNF(DNF):
-    CNF = []
-    literals = set()
-    for term in DNF:
-        if not term == '^' or not term == 'v' or not term == '(' or not term == ')':
-            literals.add(term) 
-    while len(DNF) > 0:
-        index = 0
-        clause = ''
-        if DNF[index] == 'v':
-            CNF.append(convert_clause_to_CNF(clause , literals))
-        else :
-            clause.append(DNF[index])
-    return CNF
+    def __init__(self,path,language):
+        super().__init__(path,language)
+        self.fuzzy = True
+    
+    def eval_query(self,tokenized_query):
+        return self.__eval_query(tokenized_query)
 
-def convert_clause_to_CNF(clause , literals):
-    CNF = []
-    for term in literals:
-        if not term in clause:
-            CNF.append()
+    
+        
+
+    def Convert_to_CDNF(self, dnf):
+        dnf = to_dnf(dnf)
+        for var in dnf.free_symbols:
+            new_dnf = ''
+            for cc in dnf.args:
+                if var not in cc.free_symbols:
+                    exp = sympify(f'{var} | ~{var}')
+                    new_cc = f'({str(cc)}) & ({str(exp)})'
+                    new_dnf += f'({new_cc}) | '
+                else:
+                    new_dnf += f'({str(cc)}) | '
+            new_dnf = new_dnf[:-3]
+            dnf = to_dnf(new_dnf)
+        
+        return dnf
