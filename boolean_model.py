@@ -45,17 +45,15 @@ class BooleanModel():
         # print(query)
         query = str(to_dnf(query)) 
         t_query = word_tokenize(query)
-        print(t_query)
-        tokenized_query = infix_to_postfix(t_query)
-        print(tokenized_query)
         # eval query and return relevant documents
-        return self.__eval_query(tokenized_query)
+        return self.__eval_query(t_query)
 
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
         :param tokenized_query: list of tokens in the query (postfix form)
         :returns: list of relevant document names
         '''
+        tokenized_query = infix_to_postfix(tokenized_query)
 
         operands = []
 
