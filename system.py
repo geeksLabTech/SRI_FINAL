@@ -31,6 +31,8 @@ class InformationRetrievalSystem:
         data = ir_datasets.load(dataset)
         expected_results: dict[str, list[int]] = {}
         for q in data.qrels_iter(): 
+            if q.relevance < 1:
+                continue
             if not q.query_id in expected_results:
                 expected_results[q.query_id] = []
             expected_results[q.query_id].append(q.doc_id)
@@ -57,10 +59,8 @@ class InformationRetrievalSystem:
                 else:
                     print('model not implemented')
         
-
-            
     def load_and_process_corpus_from_ir_datasets(self, dataset: str):
-        self.trie, self.documents, self.expected_results = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
+        self.trie, self.documents = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
         
     def process_query_with_vectorial_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
