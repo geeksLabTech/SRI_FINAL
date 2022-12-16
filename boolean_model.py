@@ -51,7 +51,7 @@ class BooleanModel():
                 query = dnf_q
             except:
                 print("error converting to dnf")
-        query = word_tokenize(query)
+        query = query.split()
         # print(query)
         return query
             
