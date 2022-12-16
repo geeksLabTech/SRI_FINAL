@@ -6,6 +6,16 @@ from corpus_loader import CorpusLoader
 from vectorial_model import VectorialModel
 from boolean_model import BooleanModel
 from fuzzy_model import FuzzyModel
+from evaluation_measures import InformationRetrievalEvaluator
+
+import ir_datasets
+from enum import Enum
+
+class ImplementedModels(Enum):
+    BOOLEAN = 1
+    VECTORIAL = 2
+    FUZZY = 3
+
 class InformationRetrievalSystem:
     def __init__(self, tokenizer: Tokenizer) -> None:
         self.trie = Trie()
@@ -16,8 +26,41 @@ class InformationRetrievalSystem:
     def load_and_process_corpus_from_path(self, path):
         self.trie, self.documents = self.corpus_loader.load_from_path(path, self.trie, self.documents)
 
+    def test_ir_dataset(self, dataset: str, models: list[ImplementedModels]):
+        self.load_and_process_corpus_from_ir_datasets(dataset)
+        data = ir_datasets.load(dataset)
+        expected_results: dict[str, list[int]] = {}
+        for q in data.qrels_iter(): 
+            if not q.query_id in expected_results:
+                expected_results[q.query_id] = []
+            expected_results[q.query_id].append(q.doc_id)
+        
+        evaluations = {
+            'vectorial': {},
+            'boolean': {},
+            'fuzzy': {}
+        }
+
+        for q in data.queries_iter():
+            print(q.query_id)
+            for model in models:
+                if model == ImplementedModels.VECTORIAL:
+                    r = self.process_query_with_vectorial_model(q.text)
+                    documents_id = [doc[0] for doc in r]
+                    evaluations['vectorial'][q.query_id] = InformationRetrievalEvaluator.evaluate(documents_id, expected_results[q.query_id])
+                elif model == ImplementedModels.BOOLEAN:
+                    r = self.process_query_with_boolean_model(q.text)
+                    evaluations['boolean'][q.query_id] = InformationRetrievalEvaluator.evaluate(r, expected_results[q.query_id])
+                elif model == ImplementedModels.FUZZY:
+                    r = self.process_query_with_fuzzy_model(q.text)
+                    evaluations['fuzzy'][q.query_id] = InformationRetrievalEvaluator.evaluate(r, expected_results[q.query_id])
+                else:
+                    print('model not implemented')
+        
+
+            
     def load_and_process_corpus_from_ir_datasets(self, dataset: str):
-        self.trie, self.documents = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
+        self.trie, self.documents, self.expected_results = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
         
     def process_query_with_vectorial_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
@@ -25,7 +68,7 @@ class InformationRetrievalSystem:
         vectorial_model = VectorialModel(self.trie, self.documents)
         return vectorial_model.process_query(tokenized_query)
 
-    def process_query_with_boolean_model(self, query: str) -> list[str]:
+    def process_query_with_boolean_model(self, query: str) -> list[int]:
         # TODO - update boolean model to use Trie and dict with DocumentData
         boolean_model = BooleanModel(self.trie, self.documents)
         # print(self.documents)
@@ -34,22 +77,12 @@ class InformationRetrievalSystem:
         # TODO - update boolean model to use tokenized query
         return boolean_model.query(tokenized_query)
 
-    def process_query_with_fuzzy_model(self,query: str) -> list[str]:
+    def process_query_with_fuzzy_model(self,query: str) -> list[int]:
         fuzzy_model = FuzzyModel(self.trie, self.documents)
         tokenized_query = self.tokenizer.tokenize(query)
         print('lalal')
         return fuzzy_model.query(query)
-    # def process_query_with_boolean_model(self, query: list[str]) -> list[str]:
-    #     docs_by_token_matches: dict[str, list[int]] = {}
-    #     for doc_id in self.documents:
-    #         docs_by_token_matches[doc_id] = []
-        
-    #     for i, token in enumerate(query):
-    #         node = self.trie.search(token)
-    #         if node is None:
-    #             return []
-    #         for doc_id in node.frequency_by_document:
-    #             docs_by_token_matches[doc_id].append(i)
-        
-    #     complete_matches = [x for x in docs_by_token_matches if len(docs_by_token_matches[x]) == len(query)]
-    #     return complete_matches
+  
+
+
+
