@@ -25,11 +25,11 @@ class BooleanModel():
         :returns: a list of all marching documents
         '''
         # preprocess query
-        processed_query = self.__proccess_query(tokenized_query)
+        processed_query = self.proccess_query(tokenized_query)
         # eval query and return relevant documents
         return self.__eval_query(processed_query)
 
-    def __proccess_query(self, tokenized_query):
+    def proccess_query(self, tokenized_query):
         # print(tokenized_query)
         n_tokenized_query = [tokenized_query[0]]
         for i in range(1,len(tokenized_query)):
