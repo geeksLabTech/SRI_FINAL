@@ -30,10 +30,7 @@ class BooleanModel():
         return self.__eval_query(processed_query)
 
     def __proccess_query(self, tokenized_query):
-        # print("TOK:",tokenized_query)
-        # tokenize query and convert to postfix
-        # query = self.clean_text(query)
-        # tokenized_query = word_tokenize(query)
+        # print(tokenized_query)
         n_tokenized_query = [tokenized_query[0]]
         for i in range(1,len(tokenized_query)):
             if get_type_of_token(tokenized_query[i-1]) == 4:
@@ -45,12 +42,14 @@ class BooleanModel():
                 continue
             n_tokenized_query.append(tokenized_query[i])      
                 
-        query = " ".join(n_tokenized_query)
         # print(query)
-        query = str(to_dnf(query)) 
-        t_query = word_tokenize(query)
-        
-        return t_query
+        query = " ".join(n_tokenized_query)
+        if query.find("|") != -1: 
+            # print(query.find("|"))
+            query = str(to_dnf(query)) 
+        query = word_tokenize(query)
+        # print(query)
+        return query
             
 
         # query = []
@@ -69,12 +68,13 @@ class BooleanModel():
         :param tokenized_query: list of tokens in the query (postfix form)
         :returns: list of relevant document names
         '''
+        # tokenized_query = word_tokenize(tokenized_query)
         tokenized_query = infix_to_postfix(tokenized_query)
-
+        # print()
         operands = []
 
         for token in tokenized_query:
-
+            # print(token)
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()
@@ -84,6 +84,10 @@ class BooleanModel():
             else:
                 # token = self.stemmer.stem(token.lower())
                 operands.append(self.__relevants(token))
+
+        # operands = [ op for op in operands if len(op) != 0 ]
+        # print("Operands:",len(operands))
+        # print(operands)
 
         if len(operands) != 1:
             print("Malformed query or postfix expression")

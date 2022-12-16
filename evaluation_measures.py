@@ -51,8 +51,8 @@ def analyze_query(query_result : dict):
 
 def accuracy (id_query:int , query_result : list):
     expected_result = get_dicc()
-    print(query_result,'viene del modelo')
-    print(expected_result[id_query],'sejecc')
+    # print(query_result,'viene del modelo')
+    # print(expected_result[id_query],'sejecc')
     true_positive = 0
     false_positive = 0
     for i in query_result:
