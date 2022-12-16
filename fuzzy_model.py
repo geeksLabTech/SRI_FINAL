@@ -4,14 +4,17 @@ from trie import Trie
 class FuzzyModel(BooleanModel):
 
 
-    def __init__(self,path,language , trie: Trie):
-        super().__init__(path,language)
+    def __init__(self,trie: Trie , documents):
+        super().__init__(trie,documents)
         self.fuzzy = True
         self.trie = trie
     
+
     
     def eval_query(self,tokenized_query):
+        print('llego')
         tokenized_query = self.convert_to_CDNF(tokenized_query)
+        print(tokenized_query, 'query')
         dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query,self.trie.root)
         dic_recall = self.recall(dic_queryterm_with_doc)
         return sorted(dic_recall.items(), key=lambda x: x[1])

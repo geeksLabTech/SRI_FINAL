@@ -10,8 +10,7 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
 
 from query_tools import get_type_of_token, infix_to_postfix
-from sympy import to_dnf
-import ir_datasets
+from sympy import to_dnf, Symbol
 
 
 class BooleanModel():
@@ -20,7 +19,7 @@ class BooleanModel():
         self.trie = trie
         self.documents = documents
         
-    def query(self, query):
+    def query(self, tokenized_query):
         ''' query the corpus documents using a boolean model
         :param query: valid boolean expression to search for in the documents
         :returns: a list of all marching documents
@@ -31,11 +30,11 @@ class BooleanModel():
         return self.__eval_query(processed_query)
 
     def __proccess_query(self, query):
+        # print("TOK:",tokenized_query)
         # tokenize query and convert to postfix
-        print(query)
-        tokenized_query = word_tokenize(query)
+        # query = self.clean_text(query)
+        # tokenized_query = word_tokenize(query)
         n_tokenized_query = [tokenized_query[0]]
-        
         for i in range(1,len(tokenized_query)):
             if get_type_of_token(tokenized_query[i-1]) == 4:
                 if get_type_of_token(tokenized_query[i]) == 4:
@@ -51,6 +50,19 @@ class BooleanModel():
         query = str(to_dnf(query)) 
         t_query = word_tokenize(query)
         return t_query
+            n_tokenized_query.append(tokenized_query[i])
+
+        # query = []
+        # for t in n_tokenized_query:
+        #     if get_type_of_token(t) != 3:
+        #         query.append(Symbol(t))
+        #     query.append(t)
+        # query = str(to_dnf(query))
+        # print(n_tokenized_query)
+        # t_query = word_tokenize(n_tokenized_query)
+        # eval query and return relevant documents
+        # print(self.__eval_query(n_tokenized_query), 'padreeee')
+        return self.__eval_query(n_tokenized_query)
 
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
@@ -89,9 +101,9 @@ class BooleanModel():
         """
         
         if op == "&":
-            return [ i for i in left if i in right]
+            return list(set(left).intersection(set(right)))
         elif op == "|":
-            return left + right
+            return list(set(left).union(set(right)))
         else:
             return []
         
@@ -109,9 +121,9 @@ class BooleanModel():
         
         if node:
             if negate:
-                relevant_docs = [ i for i in self.documents if node.frequency_by_document[i] == 0]
+                relevant_docs = [ i for i in self.documents if i in node.frequency_by_document and node.frequency_by_document[i] == 0]
             else:
-                relevant_docs = [ i for i in self.documents if node.frequency_by_document[i] != 0]
+                relevant_docs = [ i for i in self.documents if not i in node.frequency_by_document or node.frequency_by_document[i] != 0]
             return relevant_docs
         
         return []
@@ -133,7 +145,7 @@ class BooleanModel():
         ''' removes special characters from text'''
         text = text.replace(",.;:", " ")  
         # Regex pattern for a word
-        regex = re.compile(r"[^a-zA-Z0-9\s]")
+        regex = re.compile(r"[^\|\&a-zA-Z0-9\s]")
         # Replace and return
         return re.sub(regex, "", text)
 

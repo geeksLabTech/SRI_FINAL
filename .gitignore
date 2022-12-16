@@ -1,2 +1,10 @@
 corpus/*
 *.cache
+__pycache__/corpus_loader.cpython-311.pyc
+__pycache__/document_data.cpython-311.pyc
+__pycache__/fuzzy_model.cpython-311.pyc
+__pycache__/query_tools.cpython-311.pyc
+__pycache__/system.cpython-311.pyc
+__pycache__/tokenizer.cpython-311.pyc
+__pycache__/trie.cpython-311.pyc
+__pycache__/vectorial_model.cpython-311.pyc
