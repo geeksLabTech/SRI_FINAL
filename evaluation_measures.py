@@ -1,6 +1,38 @@
 
 from download_data import get_dicc
 
+class InformationRetrievalEvaluator:
+    @staticmethod
+    def evaluate(expected_result: list[str], query_result: list[str]) -> dict[str, float]:
+        return InformationRetrievalEvaluator.f1(set(expected_result), set(query_result), True)
+
+    @staticmethod
+    def accuracy(expected_results: set[str], query_result: set[str]) -> float:
+        true_positive = expected_results.intersection(query_result)
+        false_positive = query_result.difference(expected_results)
+        return len(true_positive) / (len(true_positive) + len(false_positive))
+        
+    @staticmethod
+    def recall(expected_results: set[str], query_result: set[str]) -> float:
+        true_positive = expected_results.intersection(query_result)
+        not_recovered = len(expected_results) - len(true_positive)
+        return len(true_positive) / (len(true_positive) + not_recovered)
+    
+    @staticmethod
+    def f1(expected_results: set[str], query_result: set[str], return_all_measures: bool):
+        accuracy = InformationRetrievalEvaluator.accuracy(expected_results, query_result)
+        recall = InformationRetrievalEvaluator.recall(expected_results, query_result)
+        f1 = 2 * accuracy * recall / (accuracy + recall)
+        if return_all_measures:
+            return {
+                'accuracy': accuracy,
+                'recall': recall,
+                'f1': f1
+            }
+        return f1
+
+
+
 def analyze_query(query_result : dict):
     dic = {}
     for i in query_result:
