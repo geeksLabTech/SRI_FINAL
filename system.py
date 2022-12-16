@@ -48,14 +48,24 @@ class InformationRetrievalSystem:
             for model in models:
                 if model == ImplementedModels.VECTORIAL:
                     r = self.process_query_with_vectorial_model(q.text)
-                    documents_id = [doc[0] for doc in r]
-                    evaluations['vectorial'][q.query_id] = InformationRetrievalEvaluator.evaluate(documents_id, expected_results[q.query_id])
+                    documents_id = [doc[0] for doc in r if doc[1] >= 0.493]
+                    try:
+                        evaluations['vectorial'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], documents_id)
+                    except KeyError:
+                        print('KeyError with Vectorial', q.query_id)
+                    print('current evaluations', evaluations)
                 elif model == ImplementedModels.BOOLEAN:
                     r = self.process_query_with_boolean_model(q.text)
-                    evaluations['boolean'][q.query_id] = InformationRetrievalEvaluator.evaluate(r, expected_results[q.query_id])
+                    try:
+                        evaluations['boolean'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], r)
+                    except KeyError:
+                        print('KeyError with Boolean', q.query_id)
                 elif model == ImplementedModels.FUZZY:
                     r = self.process_query_with_fuzzy_model(q.text)
-                    evaluations['fuzzy'][q.query_id] = InformationRetrievalEvaluator.evaluate(r, expected_results[q.query_id])
+                    try:
+                        evaluations['fuzzy'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], r)
+                    except KeyError:
+                        print('KeyError with Fuzzy', q.query_id)
                 else:
                     print('model not implemented')
         
