@@ -35,6 +35,9 @@ class Trie:
             if char not in current_node.transitions:
                 return None
             current_node = current_node.transitions[char]
+        if not current_node.is_word():
+            return None
+            
         return current_node
 
     
