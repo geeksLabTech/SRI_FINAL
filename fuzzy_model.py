@@ -1,6 +1,9 @@
 from boolean_model import BooleanModel
 from sympy import to_dnf, sympify
 from trie import Trie
+from query_tools import get_type_of_token, infix_to_postfix
+from nltk.tokenize import word_tokenize
+
 class FuzzyModel(BooleanModel):
 
 
@@ -11,7 +14,32 @@ class FuzzyModel(BooleanModel):
     
     def query(self, tokenized_query):
         processed_query = self.__proccess_query(tokenized_query)
+        print(processed_query,'ll')
         return self.eval_query(processed_query)
+
+    def __proccess_query(self, tokenized_query):
+        # print("TOK:",tokenized_query)
+        # tokenize query and convert to postfix
+        # query = self.clean_text(query)
+        # tokenized_query = word_tokenize(query)
+        n_tokenized_query = [tokenized_query[0]]
+        for i in range(1,len(tokenized_query)):
+            if get_type_of_token(tokenized_query[i-1]) == 4:
+                if get_type_of_token(tokenized_query[i]) == 4:
+                    n_tokenized_query.append("&")
+                    n_tokenized_query.append(tokenized_query[i])
+                else:
+                    n_tokenized_query.append(tokenized_query[i])
+                continue
+            n_tokenized_query.append(tokenized_query[i])      
+                
+        query = " ".join(n_tokenized_query)
+        # print(query)
+        query = str(to_dnf(query)) 
+        t_query = word_tokenize(query)
+        
+        return t_query
+    
 
     def eval_query(self,tokenized_query):
         tokenized_query = self.convert_to_CDNF(tokenized_query)

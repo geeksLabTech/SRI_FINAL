@@ -47,10 +47,10 @@ class BooleanModel():
                 
         query = " ".join(n_tokenized_query)
         # print(query)
-        # query = str(to_dnf(query)) 
-        # t_query = word_tokenize(query)
+        query = str(to_dnf(query)) 
+        t_query = word_tokenize(query)
         
-        return n_tokenized_query
+        return t_query
             
 
         # query = []

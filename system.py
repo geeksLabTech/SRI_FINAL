@@ -78,8 +78,10 @@ class InformationRetrievalSystem:
         return boolean_model.query(tokenized_query)
 
     def process_query_with_fuzzy_model(self,query: str) -> list[int]:
+        print(query)
         fuzzy_model = FuzzyModel(self.trie, self.documents)
-        tokenized_query = self.tokenizer.tokenize(query)
+        print(type(fuzzy_model))
+        # tokenized_query = self.tokenizer.tokenize(query)
         
         return fuzzy_model.query(query)
   
