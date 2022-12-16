@@ -25,11 +25,11 @@ class BooleanModel():
         :returns: a list of all marching documents
         '''
         # preprocess query
-        processed_query = self.__proccess_query(query)
+        processed_query = self.__proccess_query(tokenized_query)
         # eval query and return relevant documents
         return self.__eval_query(processed_query)
 
-    def __proccess_query(self, query):
+    def __proccess_query(self, tokenized_query):
         # print("TOK:",tokenized_query)
         # tokenize query and convert to postfix
         # query = self.clean_text(query)
@@ -47,10 +47,11 @@ class BooleanModel():
                 
         query = " ".join(n_tokenized_query)
         # print(query)
-        query = str(to_dnf(query)) 
-        t_query = word_tokenize(query)
-        return t_query
-            n_tokenized_query.append(tokenized_query[i])
+        # query = str(to_dnf(query)) 
+        # t_query = word_tokenize(query)
+        
+        return n_tokenized_query
+            
 
         # query = []
         # for t in n_tokenized_query:
@@ -62,7 +63,6 @@ class BooleanModel():
         # t_query = word_tokenize(n_tokenized_query)
         # eval query and return relevant documents
         # print(self.__eval_query(n_tokenized_query), 'padreeee')
-        return self.__eval_query(n_tokenized_query)
 
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
