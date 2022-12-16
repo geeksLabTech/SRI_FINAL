@@ -94,9 +94,8 @@ class InformationRetrievalSystem:
         print(query)
         fuzzy_model = FuzzyModel(self.trie, self.documents)
         print(type(fuzzy_model))
-        # tokenized_query = self.tokenizer.tokenize(query)
-        
-        return fuzzy_model.query(query)
+        tokenized_query = self.tokenizer.tokenize(query)
+        return fuzzy_model.query(tokenized_query)
   
 
 
