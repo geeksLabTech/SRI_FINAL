@@ -35,7 +35,7 @@ class BooleanModel():
         for i in range(1,len(tokenized_query)):
             if get_type_of_token(tokenized_query[i-1]) == 4:
                 if get_type_of_token(tokenized_query[i]) == 4:
-                    n_tokenized_query.append("&")
+                    n_tokenized_query.append("|")
                     n_tokenized_query.append(tokenized_query[i])
                 else:
                     n_tokenized_query.append(tokenized_query[i])
@@ -46,7 +46,11 @@ class BooleanModel():
         query = " ".join(n_tokenized_query)
         if query.find("|") != -1: 
             # print(query.find("|"))
-            query = str(to_dnf(query)) 
+            try:
+                dnf_q = str(to_dnf(query))
+                query = dnf_q
+            except:
+                print("error converting to dnf")
         query = word_tokenize(query)
         # print(query)
         return query
@@ -105,9 +109,17 @@ class BooleanModel():
         """
         
         if op == "&":
-            return list(set(left).intersection(set(right)))
+            res = []
+            for i in left:
+                if i in right:
+                    res.append(i)
+            return res
+            # return list(set(left).intersection(set(right)))
         elif op == "|":
-            return list(set(left).union(set(right)))
+            # print(len(left),len(right))
+            
+            return left+right
+            # return list(set(left).union(set(right)))
         else:
             return []
         
@@ -122,12 +134,17 @@ class BooleanModel():
             word = word[1:]
             
         node = self.trie.search(word)
+        # if node:
         
         if node:
+            relevant_docs = []
             if negate:
-                relevant_docs = [ i for i in self.documents if i in node.frequency_by_document and node.frequency_by_document[i] == 0]
+                relevant_docs = [ i for i in self.documents if not i in node.frequency_by_document and node.frequency_by_document[i] == 0]
             else:
-                relevant_docs = [ i for i in self.documents if not i in node.frequency_by_document or node.frequency_by_document[i] != 0]
+                for i in self.documents:
+                    if i in node.frequency_by_document.keys() and node.frequency_by_document[i] > 0:
+                        relevant_docs.append(i)
+                        
             return relevant_docs
         
         return []

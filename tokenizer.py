@@ -34,7 +34,7 @@ class NltkTokenizer(Tokenizer):
         # remove stopwords from the text
         words = [word.lower() for word in words if word not in self.stopwords]
         # stem words in document
-        # words = [self.stemmer.stem(word) for word in words]
+        words = [self.stemmer.stem(word) for word in words]
         return words
 
     def remove_digits(self, text):

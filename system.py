@@ -27,6 +27,7 @@ class InformationRetrievalSystem:
         self.trie, self.documents = self.corpus_loader.load_from_path(path, self.trie, self.documents)
 
     def test_ir_dataset(self, dataset: str, models: list[ImplementedModels]):
+        print("Testing Models")
         self.load_and_process_corpus_from_ir_datasets(dataset)
         data = ir_datasets.load(dataset)
         expected_results: dict[str, list[int]] = {}
@@ -60,6 +61,7 @@ class InformationRetrievalSystem:
                         evaluations['boolean'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], r)
                     except KeyError:
                         print('KeyError with Boolean', q.query_id)
+                    
                 elif model == ImplementedModels.FUZZY:
                     r = self.process_query_with_fuzzy_model(q.text)
                     try:
@@ -68,7 +70,8 @@ class InformationRetrievalSystem:
                         print('KeyError with Fuzzy', q.query_id)
                 else:
                     print('model not implemented')
-        
+            print('current evaluations', evaluations)
+
     def load_and_process_corpus_from_ir_datasets(self, dataset: str):
         self.trie, self.documents = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
         
