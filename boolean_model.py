@@ -25,7 +25,12 @@ class BooleanModel():
         :param query: valid boolean expression to search for in the documents
         :returns: a list of all marching documents
         '''
+        # preprocess query
+        processed_query = self.__proccess_query(query)
+        # eval query and return relevant documents
+        return self.__eval_query(processed_query)
 
+    def __proccess_query(self, query):
         # tokenize query and convert to postfix
         print(query)
         tokenized_query = word_tokenize(query)
@@ -45,8 +50,7 @@ class BooleanModel():
         # print(query)
         query = str(to_dnf(query)) 
         t_query = word_tokenize(query)
-        # eval query and return relevant documents
-        return self.__eval_query(t_query)
+        return t_query
 
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
