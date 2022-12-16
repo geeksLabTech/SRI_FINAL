@@ -9,10 +9,8 @@ class FuzzyModel(BooleanModel):
         self.fuzzy = True
         self.trie = trie
     
-
     
-    def eval_query(self,tokenized_query):
-        print('llego')
+    def __eval_query(self,tokenized_query):
         tokenized_query = self.convert_to_CDNF(tokenized_query)
         print(tokenized_query, 'query')
         dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query,self.trie.root)

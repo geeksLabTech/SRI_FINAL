@@ -37,7 +37,7 @@ class InformationRetrievalSystem:
     def process_query_with_fuzzy_model(self,query: str) -> list[str]:
         fuzzy_model = FuzzyModel(self.trie, self.documents)
         tokenized_query = self.tokenizer.tokenize(query)
-        print('lalal')
+        
         return fuzzy_model.query(query)
     # def process_query_with_boolean_model(self, query: list[str]) -> list[str]:
     #     docs_by_token_matches: dict[str, list[int]] = {}
