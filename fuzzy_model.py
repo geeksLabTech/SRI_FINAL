@@ -12,7 +12,7 @@ class FuzzyModel(BooleanModel):
         self.trie = trie
         self.all_words_nodes: list[TrieNode] = []
     
-    def query(self, tokenized_query,target_relevance):
+    def query(self, tokenized_query, target_relevance):
         processed_query = self.proccess_query(tokenized_query)
         
         query_done = ''
@@ -21,12 +21,14 @@ class FuzzyModel(BooleanModel):
         
         # print('tokenized_query: ', tokenized_query)
         # print('query_done: ', query_done)
-        relevan_document = self.eval_query(tokenized_query, query_done)
+        relevant_documents = self.eval_query(tokenized_query, query_done)
         result = []
-        for doc in relevan_document:
-            if relevan_document[doc] >= target_relevance:
-                result.append(doc)
-        return result
+        for doc in relevant_documents:
+            if relevant_documents[doc] >= target_relevance:
+                result.append((doc, relevant_documents[doc]))
+        
+        # sort result by relevance
+        return sorted(result, key=lambda x: x[1], reverse=True)
 
     def eval_query(self,tokenized_query, str_query):
         # print(tokenized_query, 'eval_query')
@@ -35,16 +37,17 @@ class FuzzyModel(BooleanModel):
         self.search_all_words_nodes(self.trie.root)
         # print("all_words: ", self.all_words)
         dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query, cdnf_query,self.all_words_nodes)
-        print(dic_queryterm_with_doc)
         dic_recall = self.recall(dic_queryterm_with_doc)
-        
+        print('actual relevance: ',  dic_recall)
         return dic_recall
+
     def build_correlation_matrix(self, tokenized_query, cdnf_query, words: list[TrieNode]):
         correlation_term_of_query_with_doc = {}
         correlation_terms_with_words = {}
         for token in tokenized_query:
             node = self.trie.search(token)
-            correlation_terms_with_words[token] = self.calculate_correlation_between_term_and_words(node, words)
+            if not node == None:
+                correlation_terms_with_words[token] = self.calculate_correlation_between_term_and_words(node, words)
         
         for term in cdnf_query:
             is_negated = False
@@ -53,29 +56,32 @@ class FuzzyModel(BooleanModel):
                 is_negated = True
             
             for word in words:
-                correlation_of_terms = correlation_terms_with_words[term][word]
+                try:
+                    correlation_of_terms = correlation_terms_with_words[term][word]
+                except KeyError:
+                    continue
+                if correlation_of_terms == None:
+                    continue
                 if is_negated:
                         correlation_of_terms = 1 - correlation_of_terms
 
                 for doc_id in word.frequency_by_document.keys():
                     if doc_id not in correlation_term_of_query_with_doc:
-                        correlation_term_of_query_with_doc[doc_id,term] = correlation_of_terms
+                        correlation_term_of_query_with_doc[doc_id] = correlation_of_terms
                     else:
-                        correlation_term_of_query_with_doc[doc_id,term] *= correlation_of_terms
-
+                        correlation_term_of_query_with_doc[doc_id] *= correlation_of_terms
         return correlation_term_of_query_with_doc
 
     def calculate_correlation_between_term_and_words(self, node_term: TrieNode, words: list[TrieNode]):
         correlation_term_with_words = {}
         for word in words:
             number_document_included_this_term = len(word.frequency_by_document)
-            if node_term == None:
-                document_included_term_of_query = 0
-                number_of_common_document = 0
-            else:
-                document_included_term_of_query = len(node_term.frequency_by_document)
-                number_of_common_document = len(set(word.frequency_by_document.keys()).intersection(set(node_term.frequency_by_document.keys())))
-            correlation_term_with_words[word] = number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)
+            document_included_term_of_query = len(node_term.frequency_by_document)
+            number_of_common_document = len(set(word.frequency_by_document.keys()).intersection(set(node_term.frequency_by_document.keys())))
+            corr =  number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)
+            if corr == 0:
+                correlation_term_with_words[word] = None
+            correlation_term_with_words[word] = corr
 
         return correlation_term_with_words
 
@@ -85,15 +91,13 @@ class FuzzyModel(BooleanModel):
         for next_node in root.transitions.values():
             self.search_all_words_nodes(next_node)
         
-
     def recall(self,dic_correlation):
         new_dic_correlation = {}
-        for doc_id in dic_correlation.keys():
+        for doc_id in dic_correlation:
             new_dic_correlation[doc_id] = 1 - dic_correlation[doc_id]
         
         return new_dic_correlation
         
-
     def convert_to_CDNF(self, dnf):
 
         dnf = to_dnf(dnf)

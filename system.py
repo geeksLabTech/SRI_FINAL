@@ -69,6 +69,9 @@ class InformationRetrievalSystem:
                     
                 elif model == ImplementedModels.FUZZY:
                     r = self.process_query_with_fuzzy_model(q.text)
+                    print('relevants fuzzy')
+                    print()
+                    print(r)
                     try:
                         evaluations['fuzzy'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], r)
                     except KeyError:
@@ -76,6 +79,7 @@ class InformationRetrievalSystem:
                 else:
                     print('model not implemented')
             print('current evaluations', evaluations)
+        return evaluations
 
     def load_and_process_corpus_from_ir_datasets(self, dataset: str):
         self.trie, self.documents = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
@@ -87,12 +91,8 @@ class InformationRetrievalSystem:
         return vectorial_model.process_query(tokenized_query)
 
     def process_query_with_boolean_model(self, query: str) -> list[int]:
-        # TODO - update boolean model to use Trie and dict with DocumentData
         boolean_model = BooleanModel(self.trie, self.documents)
-        # print(self.documents)
         tokenized_query = self.tokenizer.tokenize(query)
-
-        # TODO - update boolean model to use tokenized query
         return boolean_model.query(tokenized_query)
 
     def process_query_with_fuzzy_model(self,query: str) -> list[int]:
@@ -100,7 +100,7 @@ class InformationRetrievalSystem:
         fuzzy_model = FuzzyModel(self.trie, self.documents)
         print(type(fuzzy_model))
         tokenized_query = self.tokenizer.tokenize(query)
-        return fuzzy_model.query(tokenized_query)
+        return fuzzy_model.query(tokenized_query, 0.4)
   
 
 
