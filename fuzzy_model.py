@@ -1,6 +1,6 @@
 from boolean_model import BooleanModel
 from sympy import to_dnf, sympify
-from trie import Trie
+from trie import Trie , TrieNode
 from query_tools import get_type_of_token, infix_to_postfix
 from nltk.tokenize import word_tokenize
 
@@ -13,47 +13,70 @@ class FuzzyModel(BooleanModel):
     
     def query(self, tokenized_query):
         processed_query = self.proccess_query(tokenized_query)
+        
         query_done = ''
         for term in processed_query:
             query_done +=term
+        
         return self.eval_query(query_done)
 
     def eval_query(self,tokenized_query):
         # print(tokenized_query, 'eval_query')
         tokenized_query = self.convert_to_CDNF(tokenized_query)
         # print(tokenized_query, 'query')
-        dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query,self.trie.root)
+        print('a ver kien es lento')
+        works = self.search_all_words(self.trie.root)
+        print('mmm')
+        dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query,works)
         print(dic_queryterm_with_doc)
         dic_recall = self.recall(dic_queryterm_with_doc)
         return sorted(dic_recall.items(), key=lambda x: x[1])
 
-    def build_correlation_matrix(self,tokenized_query, current_node):
+    def build_correlation_matrix(self,tokenized_query, words):
         correlation_term_of_query_with_doc = {}
-        print('lia')    
-        # print(tokenized_query)
-        
-        # print(tokenized_query, 'tpk')
+
         for term in tokenized_query:
-            # print(term,'term')
-            node_term = self.trie.search(term)
-            # print(node_term.frequency_by_document)
-            if current_node.is_word():
-                # print('entre')
-                number_document_included_this_term = len(current_node.frequency_by_document)
+            node_term = words[term]
+            print( term,'term')
+            for word in words.keys() :
+                print(word , 'word')
+                number_document_included_this_term = len(word.frequemcy_by_document)
                 document_included_term_of_query = len(node_term.frequency_by_document)
-                number_of_common_document = len(set(current_node.frequency_by_document.keys()).intersection(set(node_term.frequency_by_document.keys())))
-                correlation_of_terms = number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)n
-                for doc_id in current_node.frequency_by_document.keys():
+                number_of_common_document = len(set(word.frequency_by_document.keys()).intersection(set(node_term.frequency_by_document.keys())))
+                correlation_of_terms = number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)
+                for doc_id in word.frequency_by_document.keys():
                     if doc_id not in correlation_term_of_query_with_doc:
                         correlation_term_of_query_with_doc[doc_id,term] = correlation_of_terms
                     correlation_term_of_query_with_doc[doc_id,term] *= correlation_of_terms
-                # print(correlation_term_of_query_with_doc)
+        # for term in tokenized_query:
+        #     # print(term,'term')
+        #     node_term = self.trie.search(term)
+        #     # print(node_term.frequency_by_document)
+        #     if current_node.is_word():
+        #         # print('entre')
+        #         number_document_included_this_term = len(current_node.frequency_by_document)
+        #         document_included_term_of_query = len(node_term.frequency_by_document)
+        #         number_of_common_document = len(set(current_node.frequency_by_document.keys()).intersection(set(node_term.frequency_by_document.keys())))
+        #         correlation_of_terms = number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)n
+        #         for doc_id in current_node.frequency_by_document.keys():
+        #             if doc_id not in correlation_term_of_query_with_doc:
+        #                 correlation_term_of_query_with_doc[doc_id,term] = correlation_of_terms
+        #             correlation_term_of_query_with_doc[doc_id,term] *= correlation_of_terms
+        #         # print(correlation_term_of_query_with_doc)
             
-            for next_node in current_node.transition:
-                self.build_correlation_matrix(tokenized_query,next_node.value)
+        #     for next_node in current_node.transition:
+        #         self.build_correlation_matrix(tokenized_query,next_node.value)
 
         return correlation_term_of_query_with_doc
 
+    def search_all_words(self, root: TrieNode):
+        works = {}
+        if root.is_word():
+            works[root] = root.frequency_by_document
+        for next_node in root.transitions.values():
+            self.search_all_words(next_node)
+        
+        return works
 
     def recall(self,dic_corelation):
         for doc_id in dic_corelation.keys():
@@ -65,6 +88,7 @@ class FuzzyModel(BooleanModel):
         dnf = to_dnf(dnf)
         # print(dnf,'dnf')
         # print(dnf.free_symbols is None)
+        print('sera')
         for var in dnf.free_symbols:
             new_dnf = ''
             for cc in dnf.args:
@@ -82,6 +106,7 @@ class FuzzyModel(BooleanModel):
             new_dnf = new_dnf[:-3]
             dnf = to_dnf(new_dnf)
             # print(type(dnf),'llllllllll')
+        
         dnf = word_tokenize(str(dnf))
             # print(dnf,'ll')
         return dnf
