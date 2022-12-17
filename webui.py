@@ -9,12 +9,10 @@ from tokenizer import NltkTokenizer, Tokenizer
 app = Flask(__name__)
 
 tokenizer = NltkTokenizer('english')
-cranfield = ir_datasets.load('cranfield')
-queries = cranfield.queries_iter()
 sri = InformationRetrievalSystem(tokenizer=tokenizer)
-sri.load_and_process_corpus_from_ir_datasets('cranfield')
+sri.load_and_process_corpus_from_path('./static/corpus/*')
 
-# boolean_model = BooleanModel('./static/corpus/*', 'english')
+# boolean_model = BooleanModel(, 'english')
 
 @app.route("/", methods = ["GET"])
 def home():

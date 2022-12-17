@@ -42,7 +42,7 @@ class FuzzyModel(BooleanModel):
                 number_document_included_this_term = len(current_node.frequency_by_document)
                 document_included_term_of_query = len(node_term.frequency_by_document)
                 number_of_common_document = len(set(current_node.frequency_by_document.keys()).intersection(set(node_term.frequency_by_document.keys())))
-                correlation_of_terms = number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)n
+                correlation_of_terms = number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)
                 for doc_id in current_node.frequency_by_document.keys():
                     if doc_id not in correlation_term_of_query_with_doc:
                         correlation_term_of_query_with_doc[doc_id,term] = correlation_of_terms
