@@ -26,7 +26,8 @@ class InformationRetrievalSystem:
     def load_and_process_corpus_from_path(self, path):
         self.trie, self.documents = self.corpus_loader.load_from_path(path, self.trie, self.documents)
 
-    def test_ir_dataset(self, dataset: str, models: list[ImplementedModels]):
+    def test_ir_dataset(self, dataset: str, models: list[ImplementedModels], number_of_queries: int):
+        # if number_of_queries < 0: process all queries 
         print("Testing Models")
         self.load_and_process_corpus_from_ir_datasets(dataset)
         data = ir_datasets.load(dataset)
@@ -45,6 +46,10 @@ class InformationRetrievalSystem:
         }
 
         for q in data.queries_iter():
+            if number_of_queries == 0:
+                break
+            if number_of_queries > 0:
+                number_of_queries -= 1
             print(q.query_id)
             for model in models:
                 if model == ImplementedModels.VECTORIAL:
