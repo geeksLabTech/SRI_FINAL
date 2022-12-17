@@ -12,16 +12,21 @@ class FuzzyModel(BooleanModel):
         self.trie = trie
         self.all_words_nodes: list[TrieNode] = []
     
-    def query(self, tokenized_query):
+    def query(self, tokenized_query,target_relevance):
         processed_query = self.proccess_query(tokenized_query)
         
         query_done = ''
         for term in processed_query:
             query_done +=term
         
-        print('tokenized_query: ', tokenized_query)
-        print('query_done: ', query_done)
-        return self.eval_query(tokenized_query, query_done)
+        # print('tokenized_query: ', tokenized_query)
+        # print('query_done: ', query_done)
+        relevan_document = self.eval_query(tokenized_query, query_done)
+        result = []
+        for doc in relevan_document:
+            if relevan_document[doc] >= target_relevance:
+                result.append(doc)
+        return result
 
     def eval_query(self,tokenized_query, str_query):
         # print(tokenized_query, 'eval_query')
@@ -32,8 +37,8 @@ class FuzzyModel(BooleanModel):
         dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query, cdnf_query,self.all_words_nodes)
         print(dic_queryterm_with_doc)
         dic_recall = self.recall(dic_queryterm_with_doc)
-        return sorted(dic_recall.items(), key=lambda x: x[1])
-
+        
+        return dic_recall
     def build_correlation_matrix(self, tokenized_query, cdnf_query, words: list[TrieNode]):
         correlation_term_of_query_with_doc = {}
         correlation_terms_with_words = {}
