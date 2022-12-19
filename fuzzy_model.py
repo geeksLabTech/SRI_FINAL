@@ -1,7 +1,6 @@
 from cmath import isclose
 import math
 from platform import node
-from this import d
 from boolean_model import BooleanModel
 from sympy import to_dnf, sympify
 from trie import Trie , TrieNode
