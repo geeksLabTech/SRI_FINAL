@@ -21,7 +21,7 @@
             </button>
             <select name="method" id="method">
                 {% for method in methods %}
-                <option value="{{method}}">{{method}}</option>
+                <option value="{{method}}" {% if method == sel_method %} selected {% endif %}>{{method}}</option>
                 {% endfor %}  
             </select>
         </form>
@@ -33,6 +33,7 @@
             <tr>
                 <td> <a href='/static/corpus/{{item[0]}}'>{{item[0]}}</a></td>
                 <td>  {{item[1]}}MB </td>
+                <td> {{relevance[item[0]]}} </td>
             </tr>
         {% endfor %}
         </table>

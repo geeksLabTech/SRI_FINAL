@@ -25,13 +25,13 @@ class CorpusLoader:
                 print("IsADirectoryError")
             
             words = self.tokenizer.tokenize(readed_file)
-            assert len(words) > 0
-            trie.insert_document(words, doc_id)
-            words_frequency = Counter(words)
-            doc_data = DocumentData(os.path.basename(filepath), len(words), max(words_frequency.values()))
-            current_documents[doc_id] = doc_data
-            doc_id += 1
-        
+            if len(words) > 0:
+                trie.insert_document(words, doc_id)
+                words_frequency = Counter(words)
+                doc_data = DocumentData(os.path.basename(filepath), os.path.basename(filepath), doc_id, len(words), max(words_frequency.values()))
+                current_documents[doc_id] = doc_data
+                doc_id += 1
+        trie.documents = current_documents
         return trie, current_documents
 
 
@@ -47,8 +47,8 @@ class CorpusLoader:
             assert len(words) > 0
             trie.insert_document(words, doc.doc_id)
             words_frequency = Counter(words)
-            doc_data = DocumentData(doc.doc_id, len(words), max(words_frequency.values()))
+            doc_data = DocumentData(doc.doc_id, doc.title, doc.doc_id, len(words), max(words_frequency.values()))
             current_documents[doc.doc_id] = doc_data
             # doc_id += 1
-        
+        trie.documents = current_documents
         return trie, current_documents
