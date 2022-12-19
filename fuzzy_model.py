@@ -1,7 +1,6 @@
 from cmath import isclose
 import math
 from platform import node
-from this import d
 from boolean_model import BooleanModel
 from sympy import to_dnf, sympify
 from trie import Trie , TrieNode
@@ -111,9 +110,8 @@ class FuzzyModel(BooleanModel):
     def convert_to_CDNF(self, dnf):
 
         dnf = to_dnf(dnf)
-        print(dnf,'dnf')
-        print('free symbols', dnf.free_symbols)
-        print('sera')
+        # print(dnf,'dnf')
+        # print(dnf.free_symbols is None)
         for var in dnf.free_symbols:
             new_dnf = ''
             for cc in dnf.args:
