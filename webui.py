@@ -38,8 +38,8 @@ def search():
             "fuzzy": sri.process_query_with_fuzzy_model
             }
         res = models[query_method](query)
-        print(type(res[0]))
-        if type(res[0]) is tuple:
+        # print(type(res[0]))
+        if len(res) > 0 and type(res[0]) is tuple:
             rel = {sri.documents[r[0]].title:r[1] for r in res}
             res = [r[0] for r in res]
             
