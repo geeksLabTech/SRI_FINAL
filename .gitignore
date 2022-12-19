@@ -1,4 +1,5 @@
 corpus/*
+.cache/*
 *.cache
 __pycache__/corpus_loader.cpython-311.pyc
 __pycache__/document_data.cpython-311.pyc

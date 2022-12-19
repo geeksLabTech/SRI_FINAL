@@ -19,6 +19,10 @@ class ImplementedModels(Enum):
 
 class InformationRetrievalSystem:
     def __init__(self, tokenizer: Tokenizer) -> None:
+        
+        if not os.path.exists(f'.cache/'):
+            os.mkdir('.cache')
+        
         self.trie = Trie()
         self.documents: dict[int, DocumentData] = {}
         self.tokenizer = tokenizer
