@@ -39,11 +39,11 @@ class BooleanModel():
                 else:
                     n_tokenized_query.append(tokenized_query[i])
                 continue
-            n_tokenized_query.append(tokenized_query[i])      
-                
+            n_tokenized_query.append(tokenized_query[i])
+
         query = " ".join(n_tokenized_query)
         # print(query)
-        query = str(to_dnf(query)) 
+        query = str(to_dnf(query))
         t_query = word_tokenize(query)
         # eval query and return relevant documents
         return self.__eval_query(t_query)

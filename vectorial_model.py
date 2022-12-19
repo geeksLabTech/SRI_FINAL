@@ -60,4 +60,3 @@ class VectorialModel:
         sorted_documents = sorted(documents_by_similarity.items(), key=lambda x: x[1], reverse=True)
         # TODO - Find a best way to sort the documents
         return sorted_documents
-
