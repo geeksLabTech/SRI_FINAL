@@ -77,6 +77,8 @@ class FuzzyModel(BooleanModel):
                     if doc_id not in correlation_term_of_query_with_doc:
                         correlation_term_of_query_with_doc[doc_id] = correlation_of_terms
                     else:
+                        if math.isclose(correlation_of_terms, 0.0):
+                            break
                         correlation_term_of_query_with_doc[doc_id] *= correlation_of_terms
                         
         return correlation_term_of_query_with_doc
