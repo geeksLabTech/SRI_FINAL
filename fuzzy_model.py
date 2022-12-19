@@ -66,6 +66,8 @@ class FuzzyModel(BooleanModel):
                         correlation_of_terms = 1 - correlation_of_terms
 
                 for doc_id in word.frequency_by_document.keys():
+                    if correlation_of_terms == 0:
+                        print('Fue 0, term: word: doc_id:', term, word, doc_id)
                     if doc_id not in correlation_term_of_query_with_doc:
                         correlation_term_of_query_with_doc[doc_id] = correlation_of_terms
                     else:
@@ -81,7 +83,8 @@ class FuzzyModel(BooleanModel):
             corr =  number_of_common_document/(document_included_term_of_query + number_document_included_this_term - number_of_common_document)
             if corr == 0:
                 correlation_term_with_words[word] = None
-            correlation_term_with_words[word] = corr
+            else:
+                correlation_term_with_words[word] = corr
 
         return correlation_term_with_words
 
