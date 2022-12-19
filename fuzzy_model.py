@@ -103,7 +103,6 @@ class FuzzyModel(BooleanModel):
         dnf = to_dnf(dnf)
         # print(dnf,'dnf')
         # print(dnf.free_symbols is None)
-        print('sera')
         for var in dnf.free_symbols:
             new_dnf = ''
             for cc in dnf.args:
