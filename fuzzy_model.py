@@ -16,21 +16,12 @@ class FuzzyModel(BooleanModel):
         self.all_words_nodes: list[TrieNode] = []
     
     def query(self, tokenized_query, target_relevance):
-        processed_query = self.proccess_query(tokenized_query)
-        is_in_CDNF = False
-        for t in processed_query:
-            if t == '|' or t == '~':
-                is_in_CDNF = True
-                break
-        
-        if not is_in_CDNF:
-            query_done = ''
-            for term in processed_query:
-                query_done +=term
-            relevant_documents = self.eval_query(tokenized_query, query_done)
-        
-        else:
-            relevant_documents = self.eval_query(tokenized_query, processed_query)
+        processed_query = self.proccess_query(tokenized_query)   
+        query_done = ''
+        for term in processed_query:
+            query_done +=term
+
+        relevant_documents = self.eval_query(tokenized_query, query_done)
 
         result = []
         for doc in relevant_documents:
@@ -41,7 +32,16 @@ class FuzzyModel(BooleanModel):
         return sorted(result, key=lambda x: x[1], reverse=True)
 
     def eval_query(self,tokenized_query, str_query):
-        cdnf_query = self.convert_to_CDNF(str_query)
+        is_in_CDNF = True
+        for t in str_query:
+            if t == '|' or t == '~':
+                is_in_CDNF = True
+                break
+        if not is_in_CDNF:
+            cdnf_query = self.convert_to_CDNF(str_query)
+        else:
+            cdnf_query = [x for x in str_query if not x==')' and not x=='(' and not x=='&' and not x=='|']
+        
         self.search_all_words_nodes(self.trie.root)
         dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query, cdnf_query,self.all_words_nodes)
         dic_recall = self.recall(dic_queryterm_with_doc)
