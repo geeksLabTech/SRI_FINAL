@@ -40,9 +40,8 @@ class BooleanModel():
                 else:
                     n_tokenized_query.append(tokenized_query[i])
                 continue
-            n_tokenized_query.append(tokenized_query[i])      
-                
-        # print(query)
+            n_tokenized_query.append(tokenized_query[i])
+
         query = " ".join(n_tokenized_query)
         if query.find("|") != -1: 
             # print(query.find("|"))

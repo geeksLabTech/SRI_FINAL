@@ -42,8 +42,8 @@ class CorpusLoader:
             if doc.text == '':
                 print('empty doc', doc.doc_id)
                 continue
-
-            words = self.tokenizer.tokenize(doc.text)
+            
+            words = self.tokenizer.tokenize(doc.text+doc.title)
             assert len(words) > 0
             trie.insert_document(words, doc.doc_id)
             words_frequency = Counter(words)
