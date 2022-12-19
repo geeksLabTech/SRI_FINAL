@@ -17,12 +17,21 @@ class FuzzyModel(BooleanModel):
     
     def query(self, tokenized_query, target_relevance):
         processed_query = self.proccess_query(tokenized_query)
+        is_in_CDNF = False
+        for t in processed_query:
+            if t == '|' or t == '~':
+                is_in_CDNF = True
+                break
         
-        query_done = ''
-        for term in processed_query:
-            query_done +=term
+        if not is_in_CDNF:
+            query_done = ''
+            for term in processed_query:
+                query_done +=term
+            relevant_documents = self.eval_query(tokenized_query, query_done)
         
-        relevant_documents = self.eval_query(tokenized_query, query_done)
+        else:
+            relevant_documents = self.eval_query(tokenized_query, processed_query)
+
         result = []
         for doc in relevant_documents:
             if relevant_documents[doc] >= target_relevance:
@@ -102,8 +111,8 @@ class FuzzyModel(BooleanModel):
     def convert_to_CDNF(self, dnf):
 
         dnf = to_dnf(dnf)
-        # print(dnf,'dnf')
-        # print(dnf.free_symbols is None)
+        print(dnf,'dnf')
+        print('free symbols', dnf.free_symbols)
         print('sera')
         for var in dnf.free_symbols:
             new_dnf = ''
@@ -124,5 +133,5 @@ class FuzzyModel(BooleanModel):
             # print(type(dnf),'llllllllll')
         
         dnf = word_tokenize(str(dnf))
-            # print(dnf,'ll')
+        print('ready', dnf)
         return [x for x in dnf if not x==')' and not x=='(' and not x=='&' and not x=='|']
