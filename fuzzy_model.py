@@ -16,11 +16,11 @@ class FuzzyModel(BooleanModel):
     
     def query(self, tokenized_query, target_relevance):
         processed_query = self.proccess_query(tokenized_query)   
-        query_done = ''
-        for term in processed_query:
-            query_done +=term
+        # query_done = ''
+        # for term in processed_query:
+        #     query_done +=term
 
-        relevant_documents = self.eval_query(tokenized_query, query_done)
+        relevant_documents = self.eval_query(tokenized_query, processed_query)
 
         result = []
         for doc in relevant_documents:
@@ -30,17 +30,18 @@ class FuzzyModel(BooleanModel):
         # sort result by relevance
         return sorted(result, key=lambda x: x[1], reverse=True)
 
-    def eval_query(self,tokenized_query, str_query):
+    def eval_query(self,tokenized_query, processed_query):
         is_in_CDNF = True
-        for t in str_query:
+        for t in processed_query:
             if t == '|' or t == '~':
-                is_in_CDNF = True
+                is_in_CDNF = False
                 break
         if not is_in_CDNF:
-            cdnf_query = self.convert_to_CDNF(str_query)
+            cdnf_query = self.convert_to_CDNF(processed_query)
         else:
-            cdnf_query = [x for x in str_query if not x==')' and not x=='(' and not x=='&' and not x=='|']
+            cdnf_query = [x for x in processed_query if not x==')' and not x=='(' and not x=='&' and not x=='|']
         
+        print(cdnf_query)
         self.search_all_words_nodes(self.trie.root)
         dic_queryterm_with_doc = self.build_correlation_matrix(tokenized_query, cdnf_query,self.all_words_nodes)
         dic_recall = self.recall(dic_queryterm_with_doc)
@@ -107,9 +108,10 @@ class FuzzyModel(BooleanModel):
         
         return new_dic_correlation
         
-    def convert_to_CDNF(self, dnf):
+    def convert_to_CDNF(self, processed_query):
 
-        dnf = to_dnf(dnf)
+        raw_query = self.convert_query_to_raw_string(processed_query)
+        dnf = to_dnf(raw_query)
         # print(dnf,'dnf')
         # print(dnf.free_symbols is None)
         for var in dnf.free_symbols:
@@ -133,3 +135,9 @@ class FuzzyModel(BooleanModel):
         dnf = word_tokenize(str(dnf))
         print('ready', dnf)
         return [x for x in dnf if not x==')' and not x=='(' and not x=='&' and not x=='|']
+
+    def convert_query_to_raw_string(self, query):
+        raw_string = ''
+        for term in query:
+            raw_string += term
+        return raw_string
