@@ -9,19 +9,10 @@ from tokenizer import NltkTokenizer, Tokenizer
 app = Flask(__name__)
 
 tokenizer = NltkTokenizer('english')
-<<<<<<< HEAD
-cranfield = ir_datasets.load('cranfield')
-queries = cranfield.queries_iter()
-sri = InformationRetrievalSystem(tokenizer=tokenizer)
-sri.load_and_process_corpus_from_ir_datasets('cranfield')
 
-# boolean_model = BooleanModel('./static/corpus/*', 'english')
-=======
+print("loading Corpus")
 sri = InformationRetrievalSystem(tokenizer=tokenizer)
 sri.load_and_process_corpus_from_path('./static/corpus/*')
-
-# boolean_model = BooleanModel(, 'english')
->>>>>>> 962492a245fb23bd310c7adecb40608229c24115
 
 @app.route("/", methods = ["GET"])
 def home():
@@ -29,18 +20,17 @@ def home():
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     res = []
+    rel = None
     methods = ["boolean", "vectorial", "fuzzy"]
+    try:
+        query_method = request.form['method']
+    except:
+        query_method = 'boolean' 
+    
     if request.method == "POST":
         query = request.form['search']
         if query == '':
             return render_template('search.html', results=None, methods=methods, query=None)
-
-        query_method = request.form['method']
-<<<<<<< HEAD
- 
-        if query_method == "boolean":
-            res = sri.process_query_with_boolean_model.query(query)
-=======
 
         models = {
             "boolean": sri.process_query_with_boolean_model, 
@@ -48,10 +38,14 @@ def search():
             "fuzzy": sri.process_query_with_fuzzy_model
             }
         res = models[query_method](query)
->>>>>>> 962492a245fb23bd310c7adecb40608229c24115
-        res = [(i,get_size(i)) for i in res]
-        return render_template('search.html', results=res, methods=methods, query=query)
-    return render_template('search.html', results=None, methods=methods, query=None)
-     
+        print(type(res[0]))
+        if type(res[0]) is tuple:
+            rel = {sri.documents[r[0]].title:r[1] for r in res}
+            res = [r[0] for r in res]
+            
+        res = [(sri.documents[i].title,get_size(i)) for i in res]
+        return render_template('search.html', results=res, methods=methods, sel_method=(query_method if query_method else 'boolean'), query=query, relevance=rel)
+    return render_template('search.html', results=None, methods=methods,sel_method=(query_method if query_method else 'boolean') ,query=None, relevance=rel)
+    
 if __name__ == "__main__":
     app.run(debug=True)

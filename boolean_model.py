@@ -35,7 +35,7 @@ class BooleanModel():
         for i in range(1,len(tokenized_query)):
             if get_type_of_token(tokenized_query[i-1]) == 4:
                 if get_type_of_token(tokenized_query[i]) == 4:
-                    n_tokenized_query.append("|")
+                    n_tokenized_query.append("&")
                     n_tokenized_query.append(tokenized_query[i])
                 else:
                     n_tokenized_query.append(tokenized_query[i])

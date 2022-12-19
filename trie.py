@@ -7,6 +7,7 @@ class TrieNode:
         self.frequency_by_document: dict[int, int] = {}
         # Given the next character, this dictionary will return the next node
         self.transitions: dict[str, TrieNode] = {}
+        self.documents = None
     
     def is_word(self) -> bool:
         return len(self.frequency_by_document) > 0
