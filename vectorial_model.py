@@ -52,10 +52,32 @@ class VectorialModel:
                     weights_by_documents[doc_id].append(token_weight_in_document)
         
         documents_by_similarity: dict[int, float] = {}
+        query_total_square_weight = sum([x**2 for x in weights_in_query])
+        sqrt_query_total_square_weight = math.sqrt(query_total_square_weight)
+        documents_by_total_squared_weights: dict[int, float] = {}
+        # print("Weights by documents: ", weights_by_documents)
+        # print('Weights in query: ')
+        # print(len(weights_in_query))
         for doc_id in weights_by_documents:
             documents_by_similarity[doc_id] = 0
             for i in range(len(weights_in_query)):
-                documents_by_similarity[doc_id] += weights_in_query[i] * weights_by_documents[doc_id][i]
+                try:
+                    documents_by_similarity[doc_id] += weights_in_query[i] * weights_by_documents[doc_id][i]
+                    if not doc_id in documents_by_total_squared_weights:
+                        documents_by_total_squared_weights[doc_id] = 0
+                    documents_by_total_squared_weights[doc_id] += (weights_by_documents[doc_id][i] ** 2)
+                except IndexError:
+                    continue
+            if documents_by_similarity[doc_id] == 0:
+                del documents_by_similarity[doc_id]
+        
+        # Normalize
+        normalization_dict: dict[int, float] = {}
+        for key in documents_by_total_squared_weights:
+            normalization_dict[key] = math.sqrt(documents_by_total_squared_weights[key]) * sqrt_query_total_square_weight
+        
+        for key in documents_by_similarity:
+            documents_by_similarity[key] = documents_by_similarity[key] / normalization_dict[key]
 
         sorted_documents = sorted(documents_by_similarity.items(), key=lambda x: x[1], reverse=True)
         # TODO - Find a best way to sort the documents

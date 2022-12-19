@@ -6,5 +6,5 @@ def get_dicc():
         if query.query_id not in dic:
             dic[query.query_id] = [(query.doc_id , query.relevance)]
         else :
-            dic[query.query_id].append(query.doc_id , query.relevance)
+            dic[query.query_id].append((query.doc_id , query.relevance))
     return dic

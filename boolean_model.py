@@ -10,8 +10,7 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
 
 from query_tools import get_type_of_token, infix_to_postfix
-from sympy import to_dnf
-import ir_datasets
+from sympy import to_dnf, Symbol
 
 
 class BooleanModel():
@@ -20,21 +19,23 @@ class BooleanModel():
         self.trie = trie
         self.documents = documents
         
-    def query(self, query):
+    def query(self, tokenized_query):
         ''' query the corpus documents using a boolean model
         :param query: valid boolean expression to search for in the documents
         :returns: a list of all marching documents
         '''
+        # preprocess query
+        processed_query = self.proccess_query(tokenized_query)
+        # eval query and return relevant documents
+        return self.__eval_query(processed_query)
 
-        # tokenize query and convert to postfix
-        print(query)
-        tokenized_query = word_tokenize(query)
+    def proccess_query(self, tokenized_query):
+        # print(tokenized_query)
         n_tokenized_query = [tokenized_query[0]]
-        
         for i in range(1,len(tokenized_query)):
             if get_type_of_token(tokenized_query[i-1]) == 4:
                 if get_type_of_token(tokenized_query[i]) == 4:
-                    n_tokenized_query.append("&")
+                    n_tokenized_query.append("|")
                     n_tokenized_query.append(tokenized_query[i])
                 else:
                     n_tokenized_query.append(tokenized_query[i])
@@ -42,23 +43,41 @@ class BooleanModel():
             n_tokenized_query.append(tokenized_query[i])
 
         query = " ".join(n_tokenized_query)
+        if query.find("|") != -1: 
+            # print(query.find("|"))
+            try:
+                dnf_q = str(to_dnf(query))
+                query = dnf_q
+            except:
+                print("error converting to dnf")
+        query = query.split()
         # print(query)
-        query = str(to_dnf(query))
-        t_query = word_tokenize(query)
+        return query
+            
+
+        # query = []
+        # for t in n_tokenized_query:
+        #     if get_type_of_token(t) != 3:
+        #         query.append(Symbol(t))
+        #     query.append(t)
+        # query = str(to_dnf(query))
+        # print(n_tokenized_query)
+        # t_query = word_tokenize(n_tokenized_query)
         # eval query and return relevant documents
-        return self.__eval_query(t_query)
+        # print(self.__eval_query(n_tokenized_query), 'padreeee')
 
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
         :param tokenized_query: list of tokens in the query (postfix form)
         :returns: list of relevant document names
         '''
+        # tokenized_query = word_tokenize(tokenized_query)
         tokenized_query = infix_to_postfix(tokenized_query)
-
+        # print()
         operands = []
 
         for token in tokenized_query:
-
+            # print(token)
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()
@@ -68,6 +87,10 @@ class BooleanModel():
             else:
                 # token = self.stemmer.stem(token.lower())
                 operands.append(self.__relevants(token))
+
+        # operands = [ op for op in operands if len(op) != 0 ]
+        # print("Operands:",len(operands))
+        # print(operands)
 
         if len(operands) != 1:
             print("Malformed query or postfix expression")
@@ -85,9 +108,17 @@ class BooleanModel():
         """
         
         if op == "&":
-            return [ i for i in left if i in right]
+            res = []
+            for i in left:
+                if i in right:
+                    res.append(i)
+            return res
+            # return list(set(left).intersection(set(right)))
         elif op == "|":
-            return left + right
+            # print(len(left),len(right))
+            
+            return left+right
+            # return list(set(left).union(set(right)))
         else:
             return []
         
@@ -102,12 +133,17 @@ class BooleanModel():
             word = word[1:]
             
         node = self.trie.search(word)
+        # if node:
         
         if node:
+            relevant_docs = []
             if negate:
-                relevant_docs = [ i for i in self.documents if node.frequency_by_document[i] == 0]
+                relevant_docs = [ i for i in self.documents if not i in node.frequency_by_document and node.frequency_by_document[i] == 0]
             else:
-                relevant_docs = [ i for i in self.documents if node.frequency_by_document[i] != 0]
+                for i in self.documents:
+                    if i in node.frequency_by_document.keys() and node.frequency_by_document[i] > 0:
+                        relevant_docs.append(i)
+                        
             return relevant_docs
         
         return []
@@ -129,7 +165,7 @@ class BooleanModel():
         ''' removes special characters from text'''
         text = text.replace(",.;:", " ")  
         # Regex pattern for a word
-        regex = re.compile(r"[^a-zA-Z0-9\s]")
+        regex = re.compile(r"[^\|\&a-zA-Z0-9\s]")
         # Replace and return
         return re.sub(regex, "", text)
 

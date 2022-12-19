@@ -1,0 +1,5 @@
+Flask==2.0.2
+ir_datasets==0.5.4
+nltk==3.6.5
+numpy==1.23.3
+sympy==1.9
