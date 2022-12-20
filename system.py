@@ -1,4 +1,5 @@
 
+import math
 from sli_model import SLIModel
 from trie import Trie
 from document_data import DocumentData
@@ -29,6 +30,7 @@ class InformationRetrievalSystem:
         self.documents: dict[int, DocumentData] = {}
         self.tokenizer = tokenizer
         self.corpus_loader = CorpusLoader(tokenizer)
+        self.vocabulary_dict: dict[str, dict[int, int]] = {}
         
     def load_and_process_corpus_from_path(self, path):
         if os.path.exists(f'.cache/corpus.pickle'):
@@ -41,19 +43,24 @@ class InformationRetrievalSystem:
                 pickle.dump(self.trie,file )
         # print(self.documents[1].path)
 
+    def new_loader_from_ir_datasets(self, dataset_name: str):
+        self.vocabulary_dict, self.documents = self.corpus_loader.new_load_from_ir_datasets(dataset_name, self.vocabulary_dict, self.documents)
+
     def test_ir_dataset(self, dataset: str, models: list[ImplementedModels], number_of_queries: int):
         # if number_of_queries < 0: process all queries 
         print("Testing Models")
                 
-        self.load_and_process_corpus_from_ir_datasets(dataset)
+        self.new_loader_from_ir_datasets(dataset)
         data = ir_datasets.load(dataset)
-        expected_results: dict[str, list[int]] = {}
+        expected_results: dict[int, list[int]] = {}
         for q in data.qrels_iter(): 
-            if q.relevance < 1:
+            # print('qid', q.query_id)
+            if int(q.relevance) < 1:
                 continue
-            if not q.query_id in expected_results:
-                expected_results[q.query_id] = []
-            expected_results[q.query_id].append(q.doc_id)
+            query_id = int(q.query_id)
+            if not query_id in expected_results:
+                expected_results[query_id] = []
+            expected_results[query_id].append(int(q.doc_id))
         
         evaluations = {
             'vectorial': {},
@@ -61,21 +68,29 @@ class InformationRetrievalSystem:
             'fuzzy': {},
             'sli': {}
         }
-
-        for q in data.queries_iter():
+        print('len expected', len(expected_results))
+        if number_of_queries < 0:
+            number_of_queries = len(expected_results)
+        for i, q in enumerate(data.queries_iter(), 1):
+            # print('number of queries', number_of_queries)
             if number_of_queries == 0:
                 break
             if number_of_queries > 0:
                 number_of_queries -= 1
-            print(q.query_id)
+            # print('es este qid', q.query_id)
+            query_id = i
             for model in models:
                 if model == ImplementedModels.VECTORIAL:
                     r = self.process_query_with_vectorial_model(q.text)
-                    documents_id = [doc[0] for doc in r if doc[1] >= 0.493]
+                    # print('max', r[0][1])
+                    max_r = r[0][1]
+                    # Find best value to cut the results
+                    documents_id = [doc[0] for doc in r if doc[1] >= max_r * 0.5]
+                    evaluation_result = InformationRetrievalEvaluator.evaluate(expected_results[query_id], documents_id)
                     try:
-                        evaluations['vectorial'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], documents_id)
+                        evaluations['vectorial'][query_id] = evaluation_result
                     except KeyError:
-                        print('KeyError with Vectorial', q.query_id)
+                        print('KeyError with Vectorial', query_id, evaluation_result)
                     # print('current evaluations', evaluations)
                 elif model == ImplementedModels.SLI:
                     r = self.process_query_with_sli_model(q.text)
@@ -103,7 +118,7 @@ class InformationRetrievalSystem:
                         print('KeyError with Fuzzy', q.query_id)
                 else:
                     print('model not implemented')
-            print('current evaluations', evaluations)
+        print('current evaluations', evaluations)
         return evaluations
 
     def load_and_process_corpus_from_ir_datasets(self, dataset: str):
@@ -112,13 +127,14 @@ class InformationRetrievalSystem:
                 self.trie = pickle.load(file)
             self.documents = self.trie.documents
         else:
-            self.trie, self.documents = self.corpus_loader.load_from_ir_datasets(dataset, self.trie, self.documents)
+            self.trie, self.documents = self.corpus_loader.new_load_from_ir_datasets(dataset, self.vocabulary_dict, self.documents)
             with open(f'.cache/{dataset}.pickle', "wb") as file:
                 pickle.dump(self.trie,file )
+                
     def process_query_with_vectorial_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
         # TODO - change to create VectorialModel only once
-        vectorial_model = VectorialModel(self.trie, self.documents)
+        vectorial_model = VectorialModel(self.documents, self.vocabulary_dict)
         return vectorial_model.process_query(tokenized_query)
     
     def process_query_with_sli_model(self, query: str) -> list[tuple[int, float]]:

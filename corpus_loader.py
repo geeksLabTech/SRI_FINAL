@@ -52,3 +52,27 @@ class CorpusLoader:
             # doc_id += 1
         trie.documents = current_documents
         return trie, current_documents
+
+    def new_load_from_ir_datasets(self, dataset_name: str, current_vocabulary: dict[str, dict[int,int]], current_documents: dict[int, DocumentData]):
+        dataset = ir_datasets.load(dataset_name)
+        for doc in dataset.docs_iter():
+            if doc.text == '':
+                print('empty doc', doc.doc_id)
+                continue
+            words = self.tokenizer.tokenize(doc.text+doc.title)
+            max_word_frequency = 0
+            assert len(words) > 0
+            doc_id = int(doc.doc_id)
+            
+            for word in words:
+                if word not in current_vocabulary:
+                    current_vocabulary[word] = {}
+                if doc_id not in current_vocabulary[word]:
+                    current_vocabulary[word][doc_id] = 0
+                current_vocabulary[word][doc_id] += 1
+                max_word_frequency = max(max_word_frequency, current_vocabulary[word][doc_id])
+
+            doc_data = DocumentData('', doc.title, doc_id, len(words), max_word_frequency)
+            current_documents[doc_id] = doc_data
+
+        return current_vocabulary, current_documents
