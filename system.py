@@ -1,4 +1,5 @@
 
+from sli_model import SLIModel
 from trie import Trie
 from document_data import DocumentData
 from tokenizer import Tokenizer
@@ -16,6 +17,7 @@ class ImplementedModels(Enum):
     BOOLEAN = 1
     VECTORIAL = 2
     FUZZY = 3
+    SLI = 4
 
 class InformationRetrievalSystem:
     def __init__(self, tokenizer: Tokenizer) -> None:
@@ -56,7 +58,8 @@ class InformationRetrievalSystem:
         evaluations = {
             'vectorial': {},
             'boolean': {},
-            'fuzzy': {}
+            'fuzzy': {},
+            'sli': {}
         }
 
         for q in data.queries_iter():
@@ -68,6 +71,14 @@ class InformationRetrievalSystem:
             for model in models:
                 if model == ImplementedModels.VECTORIAL:
                     r = self.process_query_with_vectorial_model(q.text)
+                    documents_id = [doc[0] for doc in r if doc[1] >= 0.493]
+                    try:
+                        evaluations['vectorial'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], documents_id)
+                    except KeyError:
+                        print('KeyError with Vectorial', q.query_id)
+                    # print('current evaluations', evaluations)
+                elif model == ImplementedModels.SLI:
+                    r = self.process_query_with_sli_model(q.text)
                     documents_id = [doc[0] for doc in r if doc[1] >= 0.493]
                     try:
                         evaluations['vectorial'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], documents_id)
@@ -109,6 +120,11 @@ class InformationRetrievalSystem:
         # TODO - change to create VectorialModel only once
         vectorial_model = VectorialModel(self.trie, self.documents)
         return vectorial_model.process_query(tokenized_query)
+    
+    def process_query_with_sli_model(self, query: str) -> list[tuple[int, float]]:
+        tokenized_query = self.tokenizer.tokenize(query)
+        sli_model = SLIModel(self.trie, self.documents)
+        return sli_model.process_query(tokenized_query)
 
     def process_query_with_boolean_model(self, query: str) -> list[int]:
         boolean_model = BooleanModel(self.trie, self.documents)
