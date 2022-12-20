@@ -4,25 +4,25 @@ from download_data import get_dicc
 class InformationRetrievalEvaluator:
     @staticmethod
     def evaluate(expected_result: list[int], query_result: list[int]) -> dict[str, float]:
-        # print('expected result', expected_result)
-        # print('query result', query_result)
         return InformationRetrievalEvaluator.f1(set(expected_result), set(query_result), True)
 
     @staticmethod
     def accuracy(expected_results: set[int], query_result: set[int]) -> float:
         true_positive = expected_results.intersection(query_result)
         false_positive = query_result.difference(expected_results)
-        if len(true_positive) + len(false_positive) == 0:
+        union = true_positive.union(false_positive)
+        if len(union) == 0:
             return 0
-        return len(true_positive) / (len(true_positive) + len(false_positive))
+        return len(true_positive) / len(union)
         
     @staticmethod
     def recall(expected_results: set[int], query_result: set[int]) -> float:
         true_positive = expected_results.intersection(query_result)
-        not_recovered = len(expected_results) - len(true_positive)
-        if len(true_positive) + not_recovered == 0:
+        not_recovered = expected_results.difference(query_result)
+        union = true_positive.union(not_recovered)
+        if len(union) == 0:
             return 0
-        return len(true_positive) / (len(true_positive) + not_recovered)
+        return len(true_positive) / len(union)
     
     @staticmethod
     def f1(expected_results: set[int], query_result: set[int], return_all_measures: bool):
