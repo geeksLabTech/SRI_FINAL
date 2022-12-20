@@ -74,13 +74,11 @@ class FuzzyModel(BooleanModel):
                         continue
 
                 for doc_id in word.frequency_by_document.keys():
+
                     if doc_id not in correlation_term_of_query_with_doc:
                         correlation_term_of_query_with_doc[doc_id] = correlation_of_terms
                     else:
-                        if math.isclose(correlation_of_terms, 0.0):
-                            break
-                        else:
-                            correlation_term_of_query_with_doc[doc_id] *= correlation_of_terms
+                        correlation_term_of_query_with_doc[doc_id] *= (1 - correlation_of_terms)
                         
         return correlation_term_of_query_with_doc
 
@@ -94,9 +92,9 @@ class FuzzyModel(BooleanModel):
             if math.isclose(corr, 0.0):
                 correlation_term_with_words[word] = None
             else:
-                correlation_term_with_words[word] = corr
-
-        return correlation_term_with_words
+                correlation_term_with_words[word] = 1 - corr
+        
+        return self.recall(correlation_term_with_words)
 
     def search_all_words_nodes(self, root: TrieNode):
         if root.is_word():
