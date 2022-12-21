@@ -30,14 +30,14 @@ Los resultados serán mostrados en forma de tabla justo debajo de la barra de b�
 Este modelo fue seleccionado para filtrar un corpus de datasets de kaggle (particularmente datasets relacionados con el fútbol) y se utilizó como una herramienta que puede ayudar a determinar cuales datasets pueden contener información relevante (por ejemplo se desean encontrar los datasets que tienen información de Messi con la selección Argentina la consulta sería: Messi & Argentina). Está orientado a un usuario especializado que sabe exactamente qué busca, por esto se consideró que es el mejor modelo para esto.
 ### Modelo Fuzzy
 Este modelo tiene un funcionamiento simular al fuzzy en cuanto a la manera de leer la query y leer los documentos, difieren en primera instancia en cuanto a implementación en la manera de procesar la query ya que el fuzzy, necesita la misma en forma normal diyuntiva completa, una vez que tenemos de la manera correcta para este modelo, se debe analizar el conjunto de documentos para determinar que nivel de relevaancia. Para esta tarea se siguieron los siguientes pasos:
-- Se calculo el grado de pertenencia de cada documento del corpus al conjunto difuso de cada término de la consulta utilizando la siguiente fórmula:
+- Se calculo el grado de pertenencia de cada documento del corpus al conjunto difuso de cada término de la consulta utilizando la siguiente fórmula:\\
   F(d,t)=tf×idf, donde tf = the number of occurrences of query term t in d/the number of all words in d y 
-  idf = log(the total number of documents in the retrieved set / the number of documents indexed by query term t+1)
+  idf = log(the total number of documents in the retrieved set / the number of documents indexed by query term t+1)\\
    La ecuación anterior es obtenida del siguiente paper Fuzzy Information Retrieval Based on Continuous Bag-of-Words Model, que se puede encontrar en este link https://www.mdpi.com/2073-8994/12/2/225/htm
-- Luego se calcula la relevancia del documento,utilizando la siguiente fórmula: 
-   $r = 1 - \multimap 1 - cc_ij$, donde $cc_ij$  es la relevancia del documento i con respecto al término j 
-   Esta fórmula fue obtenida del seminario Modelo de Recuperación de información Fuzzy de Andy Rosquet y Relando Sanchéz  curso 2021-2022 
-El escenario para el cual fue diseñado este modelo fue el siguiente:
+- Luego se calcula la relevancia del documento,utilizando la siguiente fórmula: \\
+   $r = 1 - \prod 1 - cc_{ij}$, donde $cc_{ij}$  es la relevancia del documento i con respecto al término j\\
+   Esta fórmula fue obtenida del seminario Modelo de Recuperación de información Fuzzy de Andy Rosquet y Relando Sanchéz  curso 2021-2022 \\
+El escenario para el cual fue diseñado este modelo fue el siguiente: Para investigadores, cuando van a iniciar un proyecto, necesitan hacer una búsqueda del estado del arte, donde necesitan tener coicidencias parciales para saber las diferentes ramas donde se esta usando la técnica, precedimiento o concépto que esta investigando.
 ### Modelo Vectorial
 
 ## Errores y Recomendaciones
