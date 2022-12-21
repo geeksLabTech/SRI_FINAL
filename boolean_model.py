@@ -26,7 +26,9 @@ class BooleanModel():
         :returns: a list of all marching documents
         '''
         # preprocess query
+        print(tokenized_query)
         processed_query = self.proccess_query(tokenized_query)
+        print(tokenized_query)
         # eval query and return relevant documents
         return self.__eval_query(processed_query)
 
@@ -62,6 +64,7 @@ class BooleanModel():
         operands = []
 
         for token in tokenized_query:
+            print( token)
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()

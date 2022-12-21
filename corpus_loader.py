@@ -6,6 +6,7 @@ from document_data import DocumentData
 from tokenizer import Tokenizer
 from trie import Trie
 import ir_datasets
+import pickle
 
 
 
@@ -15,29 +16,35 @@ class CorpusLoader:
 
     # TODO - implement cache
     def load_from_path(self, path, current_vocabulary: dict[str, dict[int,int]], current_documents: dict[int, DocumentData]):
-        doc_id = len(current_documents) + 1
-        for filepath in glob(path):
-            # opens and reads all files
-            try:
-                with open(filepath, "r", encoding="utf-8") as file:
-                    readed_file = file.read()
-            except(IsADirectoryError):
-                print("IsADirectoryError")
-            
-            words = self.tokenizer.tokenize(readed_file)
-            if len(words) > 0:
-                max_word_frequency = 0
-                for word in words:
-                    if word not in current_vocabulary:
-                        current_vocabulary[word] = {}
-                    if doc_id not in current_vocabulary[word]:
-                        current_vocabulary[word][doc_id] = 0
-                    current_vocabulary[word][doc_id] += 1
-                    max_word_frequency = max(max_word_frequency, current_vocabulary[word][doc_id])
+        if os.path.exists('.cache/corpus.pickle'):
+            with open('.cache/corpus.pickle', 'rb') as f:
+                current_vocabulary, current_documents = pickle.load(f)
+        else:      
+            doc_id = len(current_documents) + 1
+            for filepath in glob(path):
+                # opens and reads all files
+                try:
+                    with open(filepath, "r", encoding="utf-8") as file:
+                        readed_file = file.read()
+                except(IsADirectoryError):
+                    print("IsADirectoryError")
 
-                doc_data = DocumentData(path, os.path.basename(filepath), doc_id, len(words), max_word_frequency)
-                current_documents[doc_id] = doc_data
-                doc_id += 1
+                words = self.tokenizer.tokenize(readed_file)
+                if len(words) > 0:
+                    max_word_frequency = 0
+                    for word in words:
+                        if word not in current_vocabulary:
+                            current_vocabulary[word] = {}
+                        if doc_id not in current_vocabulary[word]:
+                            current_vocabulary[word][doc_id] = 0
+                        current_vocabulary[word][doc_id] += 1
+                        max_word_frequency = max(max_word_frequency, current_vocabulary[word][doc_id])
+
+                    doc_data = DocumentData(path, os.path.basename(filepath), doc_id, len(words), max_word_frequency)
+                    current_documents[doc_id] = doc_data
+                    doc_id += 1
+            with open(".cache/corpus.pickle", 'wb') as f:
+                pickle.dump((current_vocabulary, current_documents), f)
         
         return current_vocabulary, current_documents
 

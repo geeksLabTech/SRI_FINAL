@@ -31,9 +31,10 @@
             
             {% for item in results %}
             <tr>
-                <td> <a href='/static/corpus/{{item[0]}}'>{{item[0]}}</a></td>
-                <td>  {{item[1]}}MB </td>
-                <td> {{relevance[item[0]]}} </td>
+                <td> <a href='/static/corpus/{{item[0]}}'>{{item}}</a></td>
+                {% if relevance %}
+                <td> {{relevance[item]}} </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </table>

@@ -27,7 +27,7 @@ class NltkTokenizer(Tokenizer):
 
     def tokenize(self, text: str) -> list:
         # replace punctuation with spaces
-        text = re.sub(r"[^\w\s]", " ", text)
+        text = re.sub(r"[^\~\w\s]", " ", text)
         # remove all special characters
         # text = self.clean_text(text)
         text = self.remove_digits(text)
@@ -47,9 +47,10 @@ class NltkTokenizer(Tokenizer):
 
     def clean_text(self, text):
         ''' removes special characters from text'''
+        print("text", text)
         text = text.replace(",.;:", " ")  
         # Regex pattern for a word
-        regex = re.compile(r"[^\|\&a-zA-Z0-9\s]")
+        regex = re.compile(r"[^\~\|\&a-zA-Z0-9\s]")
         # Replace and return
         return re.sub(regex, "", text)
 
