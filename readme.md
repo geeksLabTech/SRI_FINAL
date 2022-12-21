@@ -7,14 +7,14 @@
     - [Modelo Booleano](#modelo-booleano)
     - [Modelo Fuzzy](#modelo-fuzzy)
     - [Modelo Vectorial](#modelo-vectorial)
-    - [Modelo de semantica latente](#modelo-de-semantica-latente)
+    - [Modelo de semántica latente](#modelo-de-semántica-latente)
   - [Errores y Recomendaciones](#errores-y-recomendaciones)
 
 
 ## Integrantes:
-- Javier A. Oramas Lopez C312
+- Javier A. Oramas López C312
 - Lia Zerquera Ferrer C312
-- Daniel A. Cardenas Cabrera C311
+- Daniel A. Cárdenas Cabrera C311
 
 ## Pasos para ejecutar:
 * Si ocurre un error a la hora de ejecutar lo comandos, sustituir `pip` por `pip3` y `python` por `python3`
@@ -36,9 +36,9 @@ Los resultados serán mostrados en forma de tabla justo debajo de la barra de b�
 - Se implementó de forma tal que también puede ser utilizado como biblioteca separada y con total soporte a los corpus disponibles en ir_datasets, además de poder cargar corpus desde una dirección en el almacenamiento, solo se debe garantizar que se encuentre en archivos de texto plano.
 
 ## Modelos Implementados
-Los modelos se manejan desde la clase InformationRetrievalSystem en system.py, esta posee la funcionalidad de cargar los corpus de ir_dataset o desde una ruta especificada, la cual esta implementada en la clase CorpusLoader en corpus_loader.py. Al cargar un corpus se construye el diccionario vocabulary_dict que tiene como llaves todas las palabras del corpus y como valores diccionarios q tienen como llaves los id de los documentos donde aparece la palabra y como valor la frecuencia con que aparece en ese documento. Tambien se construye el diccionario documents que tiene como llaves los id de los documentos del corpus y como valor una Clase DocumentData que tiene informacion util de cada documento como la cantidad de veces que esta la palabra que mas se repite o el total de pabalabras.
-Todos los modelos implementados utilizan estos dicciionarios para realizar sus operaciones.
-Cuenta ademas con la funcionalidad de testear todas las queries de un dataset de ir_datasets mostrando las medidas de evaluacion por cada query.
+Los modelos se manejan desde la clase InformationRetrievalSystem en system.py, esta posee la funcionalidad de cargar los corpus de ir_dataset o desde una ruta especificada, la cual esta implementada en la clase CorpusLoader en corpus_loader.py. Al cargar un corpus se construye el diccionario vocabulary_dict que tiene como llaves todas las palabras del corpus y como valores diccionarios q tienen como llaves los id de los documentos donde aparece la palabra y como valor la frecuencia con que aparece en ese documento. Tambien se construye el diccionario documents que tiene como llaves los id de los documentos del corpus y como valor una Clase DocumentData que tiene información útil de cada documento como la cantidad de veces que esta la palabra que más se repite o el total de pabalabras.  
+Todos los modelos implementados utilizan estos diccionarios para realizar sus operaciones.  
+Cuenta además con la funcionalidad de testear todas las queries de un dataset de ir_datasets mostrando las medidas de evaluacion por cada query.
 Las medidas de evaluacion implementadas pueden encontrarse en evaluation_measures.py
 
 ### Modelo Booleano
@@ -54,16 +54,16 @@ Este modelo tiene un funcionamiento simular al fuzzy en cuanto a la manera de le
    Esta fórmula fue obtenida del seminario Modelo de Recuperación de información Fuzzy de Andy Rosquet y Relando Sanchéz  curso 2021-2022   
 El escenario para el cual fue diseñado este modelo fue el siguiente: Para investigadores, cuando van a iniciar un proyecto, necesitan hacer una búsqueda del estado del arte, donde necesitan tener coicidencias parciales para saber las diferentes ramas donde se esta usando la técnica, precedimiento o concépto que esta investigando.
 ### Modelo Vectorial
-Para el calculo del idf se utilizo la formula $idf = log [ (1 + N) / (1 + n) ] + 1$ que es un poco diferente a la formula clasica, la explicacion de por que se escogio esta forma se encuentra en
+Para el calculo del idf se utilizó la fórmula $idf = log [ (1 + N) / (1 + n) ] + 1$ que es un poco diferente a la fórmula clasica, la explicación de por que se escogio esta forma se encuentra en
 la [documentacion de sklearn](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfTransformer.html#sklearn.feature_extraction.text.TfidfTransformer).
 
-### Modelo de semantica latente
-La clase SliModel donde se implementa el modelo de semantica latente hereda de VectorialModel para reutilizar las funciones de crear la matriz de terminos y documentos, se utilizan las formulas presentadas en el seminario de Niley Gonzales y Arian Pazo 2022 pero como matriz A para descomponer se escoge la representacion de $tf*idf$ en vez de simplemente la matriz de frecuencias
+### Modelo de semántica latente
+La clase SliModel donde se implementa el modelo de semántica latente hereda de VectorialModel para reutilizar las funciones de crear la matriz de términos y documentos, se utilizan las fórmulas presentadas en el seminario de Niley Gonzales y Arian Pazo 2022 pero como matriz A para descomponer se escoge la representacion de $tf*idf$ en vez de simplemente la matriz de frecuencias
 
 ## Errores y Recomendaciones
-Probar otros datasets aparte de Cranfield para evaluar la efectivad y eficiencia de los modelos con consultas diferentes y muchos mas documentos
+Probar otros datasets aparte de Cranfield para evaluar la efectivad y eficiencia de los modelos con consultas diferentes y muchos más documentos
 
-Probar como se afectan las medidas de evaluacion en los modelos al eliminar ciertos tipos de palabras de los documentos
+Probar como se afectan las medidas de evaluación en los modelos al eliminar ciertos tipos de palabras de los documentos
 
 Probar otros tipos de tokenizadores como el de spacy y ver cual da mejor resultado
 
