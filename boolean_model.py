@@ -30,7 +30,6 @@ class BooleanModel():
         return self.__eval_query(processed_query)
 
     def proccess_query(self, tokenized_query):
-        # print(tokenized_query)
         n_tokenized_query = [tokenized_query[0]]
         for i in range(1,len(tokenized_query)):
             if get_type_of_token(tokenized_query[i-1]) == 4:
@@ -44,40 +43,24 @@ class BooleanModel():
 
         query = " ".join(n_tokenized_query)
         if query.find("|") != -1: 
-            # print(query.find("|"))
             try:
                 dnf_q = str(to_dnf(query))
                 query = dnf_q
             except:
                 print("error converting to dnf")
         query = query.split()
-        # print(query)
         return query
             
-
-        # query = []
-        # for t in n_tokenized_query:
-        #     if get_type_of_token(t) != 3:
-        #         query.append(Symbol(t))
-        #     query.append(t)
-        # query = str(to_dnf(query))
-        # print(n_tokenized_query)
-        # t_query = word_tokenize(n_tokenized_query)
-        # eval query and return relevant documents
-        # print(self.__eval_query(n_tokenized_query), 'padreeee')
-
     def __eval_query(self, tokenized_query):
         ''' Evaluates the query with the preprovcessed corpus
         :param tokenized_query: list of tokens in the query (postfix form)
         :returns: list of relevant document names
         '''
-        # tokenized_query = word_tokenize(tokenized_query)
+       
         tokenized_query = infix_to_postfix(tokenized_query)
-        # print()
         operands = []
 
         for token in tokenized_query:
-            # print(token)
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()
@@ -85,12 +68,7 @@ class BooleanModel():
                 result = self.__eval_operation(left_op, right_op, token)
                 operands.append(result)
             else:
-                # token = self.stemmer.stem(token.lower())
                 operands.append(self.__relevants(token))
-
-        # operands = [ op for op in operands if len(op) != 0 ]
-        # print("Operands:",len(operands))
-        # print(operands)
 
         if len(operands) != 1:
             print("Malformed query or postfix expression")
@@ -115,8 +93,6 @@ class BooleanModel():
             return res
             # return list(set(left).intersection(set(right)))
         elif op == "|":
-            # print(len(left),len(right))
-            
             return left+right
             # return list(set(left).union(set(right)))
         else:
@@ -150,22 +126,5 @@ class BooleanModel():
 
     def remove_duplicates(self, text):
         ''' removes duplicates from text'''
-
         return list(set(text))
-
-    def remove_digits(self, text):
-        ''' removes digits from text'''
-
-        regex = re.compile(r"\d") 
-        # Replace and return
-        return re.sub(regex, "", text)
-
-
-    def clean_text(self, text):
-        ''' removes special characters from text'''
-        text = text.replace(",.;:", " ")  
-        # Regex pattern for a word
-        regex = re.compile(r"[^\|\&a-zA-Z0-9\s]")
-        # Replace and return
-        return re.sub(regex, "", text)
 
