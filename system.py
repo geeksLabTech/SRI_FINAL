@@ -31,6 +31,10 @@ class InformationRetrievalSystem:
         self.tokenizer = tokenizer
         self.corpus_loader = CorpusLoader(tokenizer)
         self.vocabulary_dict: dict[str, dict[int, int]] = {}
+        self.fuzzy_model = None
+        self.boolean_model = None
+        self.vectorial_model = None
+        self.sli_model = None
         
     def load_and_process_corpus_from_path(self, path):
         if os.path.exists(f'.cache/corpus.pickle'):
@@ -91,7 +95,6 @@ class InformationRetrievalSystem:
                         evaluations['vectorial'][query_id] = evaluation_result
                     except KeyError:
                         print('KeyError with Vectorial', query_id, evaluation_result)
-                    # print('current evaluations', evaluations)
                 elif model == ImplementedModels.SLI:
                     r = self.process_query_with_sli_model(q.text)
                     max_r = r[0][1]
@@ -101,7 +104,7 @@ class InformationRetrievalSystem:
                         evaluations['sli'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], documents_id)
                     except KeyError:
                         print('KeyError with Vectorial', query_id)
-                    print('current evaluations', evaluations)
+                    
                 elif model == ImplementedModels.BOOLEAN:
                     r = self.process_query_with_boolean_model(q.text)
                     try:
@@ -111,9 +114,6 @@ class InformationRetrievalSystem:
                     
                 elif model == ImplementedModels.FUZZY:
                     r = self.process_query_with_fuzzy_model(q.text)
-                    print('relevants fuzzy')
-                    print()
-                    print(r)
                     try:
                         evaluations['fuzzy'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], r)
                     except KeyError:
@@ -136,13 +136,16 @@ class InformationRetrievalSystem:
     def process_query_with_vectorial_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
         # TODO - change to create VectorialModel only once
-        vectorial_model = VectorialModel(self.documents, self.vocabulary_dict)
-        return vectorial_model.process_query(tokenized_query)
+        if not self.vectorial_model:
+            self.vectorial_model = VectorialModel(self.documents, self.vocabulary_dict)
+        return self.vectorial_model.process_query(tokenized_query)
     
     def process_query_with_sli_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
-        sli_model = SLIModel(self.documents, self.vocabulary_dict)
-        return sli_model.process_query(tokenized_query)
+        if not self.sli_model:
+            self.sli_model = SLIModel(self.documents, self.vocabulary_dict)
+
+        return self.sli_model.process_query(tokenized_query)
 
     def process_query_with_boolean_model(self, query: str) -> list[int]:
         boolean_model = BooleanModel(self.trie, self.documents)
