@@ -10,7 +10,7 @@ from vectorization_utils import get_idf , get_tf
 from document_data import DocumentData
 
 class FuzzyModel(BooleanModel):
-    def __init__(self,vocabulary_dict: dict[str,dict[int,int]] ,trie : Trie, documents:dict[int, DocumentData]):
+    def __init__(self,vocabulary_dict: dict[str,dict[int,int]],documents:dict[int, DocumentData],trie : Trie):
         super().__init__(trie,documents)
         self.documents = documents
         self.fuzzy = True
@@ -21,13 +21,13 @@ class FuzzyModel(BooleanModel):
         processed_query = self.proccess_query(tokenized_query)   
         relevant_documents = self.eval_query(tokenized_query, processed_query)
 
-        result = []
-        for doc in relevant_documents:
-            if relevant_documents[doc] >= target_relevance:
-                result.append((doc, relevant_documents[doc]))
-        
+        # result = []
+        # for doc in relevant_documents:
+        #     if relevant_documents[doc] >= 0.1:
+        #         result.append((doc, relevant_documents[doc]))
+        # print(result)
         # sort result by relevance
-        return sorted(result, key=lambda x: x[1], reverse=True)
+        return sorted(relevant_documents.items(), key=lambda x: x[1], reverse=True)
 
     def eval_query(self,tokenized_query, processed_query):
         is_in_CDNF = True
@@ -44,6 +44,8 @@ class FuzzyModel(BooleanModel):
         # self.search_all_words_nodes(self.trie.root)
         dic_queryterm_with_doc = self.calculate_rank(tokenized_query, cdnf_query)
         dic_recall = self.recall(dic_queryterm_with_doc)
+        # print(dic_recall , 'rank')
+        # sorted_documents = sorted(dic_recall.items(), key=lambda x: x[1], reverse=True)
         return dic_recall
 
     def calculate_rank(self, tokenized_query, cdnf_query):

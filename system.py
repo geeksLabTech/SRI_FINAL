@@ -115,7 +115,7 @@ class InformationRetrievalSystem:
                 elif model == ImplementedModels.FUZZY:
                     r = self.process_query_with_fuzzy_model(q.text)
                     try:
-                        evaluations['fuzzy'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], r)
+                        evaluations['fuzzy'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], documents_id)
                     except KeyError:
                         print('KeyError with Fuzzy', query_id)
                 else:
@@ -154,7 +154,7 @@ class InformationRetrievalSystem:
 
     def process_query_with_fuzzy_model(self,query: str) -> list[int]:
         print(query)
-        fuzzy_model = FuzzyModel(self.trie, self.documents)
+        fuzzy_model = FuzzyModel(self.vocabulary_dict,self.documents,self.trie)
         print(type(fuzzy_model))
         tokenized_query = self.tokenizer.tokenize(query)
         return fuzzy_model.query(tokenized_query, 0.4)
