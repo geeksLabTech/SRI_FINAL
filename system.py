@@ -153,6 +153,7 @@ class InformationRetrievalSystem:
     def process_query_with_boolean_model(self, query: str) -> list[int]:
         boolean_model = BooleanModel(self.documents, self.vocabulary_dict)
         tokenized_query = self.tokenizer.tokenize(query)
+        print(tokenized_query)
         return boolean_model.query(tokenized_query)
 
     def process_query_with_fuzzy_model(self,query: str) -> list[tuple[int, float]]:
