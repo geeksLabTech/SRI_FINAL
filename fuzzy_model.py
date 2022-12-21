@@ -10,14 +10,14 @@ from vectorization_utils import get_idf , get_tf
 from document_data import DocumentData
 
 class FuzzyModel(BooleanModel):
-    def __init__(self,vocabulary_dict: dict[str,dict[int,int]],documents:dict[int, DocumentData],trie : Trie):
-        super().__init__(trie,documents)
+    def __init__(self, documents:dict[int, DocumentData], vocabulary_dict: dict[str,dict[int,int]]):
+        super().__init__(documents, vocabulary_dict)
         self.documents = documents
         self.fuzzy = True
         self.vocabulary_dict = vocabulary_dict
         self.all_words_nodes: list[TrieNode] = []
     
-    def query(self, tokenized_query, target_relevance):
+    def query(self, tokenized_query: list) -> list[tuple[int, float]]:
         processed_query = self.proccess_query(tokenized_query)   
         relevant_documents = self.eval_query(tokenized_query, processed_query)
 

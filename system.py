@@ -114,6 +114,9 @@ class InformationRetrievalSystem:
                     
                 elif model == ImplementedModels.FUZZY:
                     r = self.process_query_with_fuzzy_model(q.text)
+                    max_r = r[0][1]
+                    # Find best value to cut the results
+                    documents_id = [doc[0] for doc in r if doc[1] >= max_r * 0.5]
                     try:
                         evaluations['fuzzy'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], documents_id)
                     except KeyError:
@@ -148,16 +151,17 @@ class InformationRetrievalSystem:
         return self.sli_model.process_query(tokenized_query)
 
     def process_query_with_boolean_model(self, query: str) -> list[int]:
-        boolean_model = BooleanModel(self.trie, self.documents)
+        boolean_model = BooleanModel(self.documents, self.vocabulary_dict)
         tokenized_query = self.tokenizer.tokenize(query)
         return boolean_model.query(tokenized_query)
 
-    def process_query_with_fuzzy_model(self,query: str) -> list[int]:
+    def process_query_with_fuzzy_model(self,query: str) -> list[tuple[int, float]]:
         print(query)
-        fuzzy_model = FuzzyModel(self.vocabulary_dict,self.documents,self.trie)
-        print(type(fuzzy_model))
+        if not self.fuzzy_model:
+            self.fuzzy_model = FuzzyModel(self.documents, self.vocabulary_dict)
+        
         tokenized_query = self.tokenizer.tokenize(query)
-        return fuzzy_model.query(tokenized_query, 0.4)
+        return self.fuzzy_model.query(tokenized_query)
   
 
 
