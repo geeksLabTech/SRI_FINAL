@@ -4,23 +4,17 @@ import numpy as np
 from trie import Trie, TrieNode
 from document_data import DocumentData
 from collections import Counter
-
+from vectorization_utils import get_tf, get_idf
 
 class VectorialModel:
     def __init__(self, documents: dict[int, DocumentData], vocabulary_dict: dict[str, dict[int,int]]) -> None:
         self.documents = documents
         self.vocabulary_dict = vocabulary_dict
         
-    def get_idf(self, total_documents: int, docs_with_word: int) -> float:
-        return np.log( (1 + total_documents) / (1 + docs_with_word) ) + 1
-
-    def get_tf(self, frequency, max_frequency) -> int:
-        return frequency / max_frequency
-
     def get_weight_of_a_word_in_document(self, word_frequency_in_doc: int, doc_id: int, docs_with_word: int) -> float:
         max_freq = self.documents[doc_id].max_frequency_term
-        tf = self.get_tf(word_frequency_in_doc, max_freq)
-        idf = self.get_idf(len(self.documents), docs_with_word)
+        tf = get_tf(word_frequency_in_doc, max_freq)
+        idf = get_idf(len(self.documents), docs_with_word)
         return tf * idf
 
     def create_documents_vectors(self) -> np.ndarray:
@@ -41,8 +35,8 @@ class VectorialModel:
             if word in query:
                 freq = frequency_dict[word]
                 docs_with_word = len(self.vocabulary_dict[word])
-                tf = self.get_tf(freq, max(frequency_dict.values()))
-                idf = self.get_idf(len(self.documents), docs_with_word)
+                tf = get_tf(freq, max(frequency_dict.values()))
+                idf = get_idf(len(self.documents), docs_with_word)
                 query_vector[i] = (a + (1-a) * tf) * idf
 
         return query_vector
