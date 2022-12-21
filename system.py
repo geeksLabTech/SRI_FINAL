@@ -94,18 +94,20 @@ class InformationRetrievalSystem:
                     # print('current evaluations', evaluations)
                 elif model == ImplementedModels.SLI:
                     r = self.process_query_with_sli_model(q.text)
-                    documents_id = [doc[0] for doc in r if doc[1] >= 0.493]
+                    max_r = r[0][1]
+                    # Find best value to cut the results
+                    documents_id = [doc[0] for doc in r if doc[1] >= max_r * 0.5]
                     try:
-                        evaluations['vectorial'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], documents_id)
+                        evaluations['sli'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], documents_id)
                     except KeyError:
-                        print('KeyError with Vectorial', q.query_id)
+                        print('KeyError with Vectorial', query_id)
                     print('current evaluations', evaluations)
                 elif model == ImplementedModels.BOOLEAN:
                     r = self.process_query_with_boolean_model(q.text)
                     try:
-                        evaluations['boolean'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], r)
+                        evaluations['boolean'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], r)
                     except KeyError:
-                        print('KeyError with Boolean', q.query_id)
+                        print('KeyError with Boolean', query_id)
                     
                 elif model == ImplementedModels.FUZZY:
                     r = self.process_query_with_fuzzy_model(q.text)
@@ -113,9 +115,9 @@ class InformationRetrievalSystem:
                     print()
                     print(r)
                     try:
-                        evaluations['fuzzy'][q.query_id] = InformationRetrievalEvaluator.evaluate(expected_results[q.query_id], r)
+                        evaluations['fuzzy'][query_id] = InformationRetrievalEvaluator.evaluate(expected_results[query_id], r)
                     except KeyError:
-                        print('KeyError with Fuzzy', q.query_id)
+                        print('KeyError with Fuzzy', query_id)
                 else:
                     print('model not implemented')
         print('current evaluations', evaluations)
@@ -139,7 +141,7 @@ class InformationRetrievalSystem:
     
     def process_query_with_sli_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)
-        sli_model = SLIModel(self.trie, self.documents)
+        sli_model = SLIModel(self.documents, self.vocabulary_dict)
         return sli_model.process_query(tokenized_query)
 
     def process_query_with_boolean_model(self, query: str) -> list[int]:
