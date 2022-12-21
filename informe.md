@@ -35,7 +35,7 @@ Este modelo tiene un funcionamiento simular al fuzzy en cuanto a la manera de le
   idf = log(the total number of documents in the retrieved set / the number of documents indexed by query term t+1)  
    La ecuación anterior es obtenida del siguiente paper Fuzzy Information Retrieval Based on Continuous Bag-of-Words Model, que se puede encontrar en este link https://www.mdpi.com/2073-8994/12/2/225/htm
 - Luego se calcula la relevancia del documento,utilizando la siguiente fórmula:   
-   $ r = 1 - \prod 1 - cc_{ij}$, donde $cc_{ij}$  es la relevancia del documento i con respecto al término j  
+     $r = 1 - \prod 1 - cc_{ij}$, donde $cc_{ij}$  es la relevancia del documento i con respecto al término j  
    Esta fórmula fue obtenida del seminario Modelo de Recuperación de información Fuzzy de Andy Rosquet y Relando Sanchéz  curso 2021-2022   
 El escenario para el cual fue diseñado este modelo fue el siguiente: Para investigadores, cuando van a iniciar un proyecto, necesitan hacer una búsqueda del estado del arte, donde necesitan tener coicidencias parciales para saber las diferentes ramas donde se esta usando la técnica, precedimiento o concépto que esta investigando.
 ### Modelo Vectorial
