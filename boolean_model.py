@@ -26,9 +26,9 @@ class BooleanModel():
         :returns: a list of all marching documents
         '''
         # preprocess query
-        print(tokenized_query)
+        # print(tokenized_query)
         processed_query = self.proccess_query(tokenized_query)
-        print(tokenized_query)
+        # print(tokenized_query)
         # eval query and return relevant documents
         return self.__eval_query(processed_query)
 
@@ -64,7 +64,7 @@ class BooleanModel():
         operands = []
 
         for token in tokenized_query:
-            print( token)
+            # print( token)
             if get_type_of_token(token) == 3:
                 right_op = operands.pop()
                 left_op = operands.pop()
@@ -106,7 +106,7 @@ class BooleanModel():
         ''' make a bitvector from the word'''
 
         negate = False
-        print('original word', word)
+        # print('original word', word)
         # If word is "~good"
         if word[0] == "~":
             negate = True
@@ -114,13 +114,13 @@ class BooleanModel():
             
         # node = self.trie.search(word)
         relevant_docs = []
-        print('word', word)
-        print('negate', negate)
+        # print('word', word)
+        # print('negate', negate)
         if word in self.vocabulary_dict:
             if negate:
-                print('mira')
+                # print('mira')
                 relevant_docs = [ i for i in self.documents if not i in self.vocabulary_dict[word]]
-                print(relevant_docs)
+                # print(relevant_docs)
             else:
                 relevant_docs = [ i for i in self.vocabulary_dict[word]]
         else:

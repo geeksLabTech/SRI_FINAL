@@ -47,7 +47,7 @@ class NltkTokenizer(Tokenizer):
 
     def clean_text(self, text):
         ''' removes special characters from text'''
-        print("text", text)
+        # print("text", text)
         text = text.replace(",.;:", " ")  
         # Regex pattern for a word
         regex = re.compile(r"[^\~\|\&a-zA-Z0-9\s]")

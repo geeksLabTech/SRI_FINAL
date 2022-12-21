@@ -86,7 +86,11 @@ class CorpusLoader:
                 current_vocabulary[word][doc_id] += 1
                 max_word_frequency = max(max_word_frequency, current_vocabulary[word][doc_id])
 
-            doc_data = DocumentData('', doc.title, doc_id, len(words), max_word_frequency)
+            try:
+                doc_data = DocumentData('', doc.title, doc_id, len(words), max_word_frequency)
+            except:
+                doc_data = DocumentData('', doc_id, doc_id, len(words), max_word_frequency)
+                
             current_documents[doc_id] = doc_data
 
         return current_vocabulary, current_documents

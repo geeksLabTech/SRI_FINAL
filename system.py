@@ -83,6 +83,7 @@ class InformationRetrievalSystem:
                 number_of_queries -= 1
             # print('es este qid', q.query_id)
             query_id = i
+            print(query_id)
             for model in models:
                 if model == ImplementedModels.VECTORIAL:
                     r = self.process_query_with_vectorial_model(q.text)
@@ -153,11 +154,9 @@ class InformationRetrievalSystem:
     def process_query_with_boolean_model(self, query: str) -> list[int]:
         boolean_model = BooleanModel(self.documents, self.vocabulary_dict)
         tokenized_query = self.tokenizer.tokenize(query)
-        print(tokenized_query)
         return boolean_model.query(tokenized_query)
 
     def process_query_with_fuzzy_model(self,query: str) -> list[tuple[int, float]]:
-        print(query)
         if not self.fuzzy_model:
             self.fuzzy_model = FuzzyModel(self.documents, self.vocabulary_dict)
         
