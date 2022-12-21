@@ -37,14 +37,14 @@ class InformationRetrievalSystem:
         self.sli_model = None
         
     def load_and_process_corpus_from_path(self, path):
-        if os.path.exists(f'.cache/corpus.pickle'):
-            with open(f'.cache/corpus.pickle', "rb") as file:
-                self.trie = pickle.load(file)
-            self.documents = self.trie.documents
-        else:
-            self.trie, self.documents = self.corpus_loader.load_from_path(path, self.trie, self.documents)
-            with open(f'.cache/corpus.pickle', "wb") as file:
-                pickle.dump(self.trie,file )
+        # if os.path.exists(f'.cache/corpus.pickle'):
+        #     with open(f'.cache/corpus.pickle', "rb") as file:
+        #         self.trie = pickle.load(file)
+        #     self.documents = self.trie.documents
+        # else:
+        self.vocabulary_dict, self.documents = self.corpus_loader.load_from_path(path, self.vocabulary_dict, self.documents)
+            # with open(f'.cache/corpus.pickle', "wb") as file:
+            #     pickle.dump(self.trie,file )
         # print(self.documents[1].path)
 
     def new_loader_from_ir_datasets(self, dataset_name: str):
@@ -126,15 +126,15 @@ class InformationRetrievalSystem:
         print('current evaluations', evaluations)
         return evaluations
 
-    def load_and_process_corpus_from_ir_datasets(self, dataset: str):
-        if os.path.exists(f'.cache/{dataset}.pickle'):
-            with open(f'.cache/{dataset}.pickle', "rb") as file:
-                self.trie = pickle.load(file)
-            self.documents = self.trie.documents
-        else:
-            self.trie, self.documents = self.corpus_loader.new_load_from_ir_datasets(dataset, self.vocabulary_dict, self.documents)
-            with open(f'.cache/{dataset}.pickle', "wb") as file:
-                pickle.dump(self.trie,file )
+    # def load_and_process_corpus_from_ir_datasets(self, dataset: str):
+    #     if os.path.exists(f'.cache/{dataset}.pickle'):
+    #         with open(f'.cache/{dataset}.pickle', "rb") as file:
+    #             self.trie = pickle.load(file)
+    #         self.documents = self.trie.documents
+    #     else:
+    #         self.trie, self.documents = self.corpus_loader.new_load_from_ir_datasets(dataset, self.vocabulary_dict, self.documents)
+    #         with open(f'.cache/{dataset}.pickle', "wb") as file:
+    #             pickle.dump(self.trie,file )
                 
     def process_query_with_vectorial_model(self, query: str) -> list[tuple[int, float]]:
         tokenized_query = self.tokenizer.tokenize(query)

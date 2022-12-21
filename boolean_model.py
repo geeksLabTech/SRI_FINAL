@@ -15,9 +15,10 @@ from sympy import to_dnf, Symbol
 
 class BooleanModel():
     '''Boolean Model class for information retrieval'''
-    def __init__(self, trie, documents) -> None:
-        self.trie = trie
+    def __init__(self, documents, vocabulary_dict: dict[str, dict[int, int]]) -> None:
+        # self.trie = trie
         self.documents = documents
+        self.vocabulary_dict = vocabulary_dict
         
     def query(self, tokenized_query):
         ''' query the corpus documents using a boolean model
@@ -102,27 +103,28 @@ class BooleanModel():
         ''' make a bitvector from the word'''
 
         negate = False
-
+        print('original word', word)
         # If word is "~good"
         if word[0] == "~":
             negate = True
             word = word[1:]
             
-        node = self.trie.search(word)
-        # if node:
-        
-        if node:
-            relevant_docs = []
+        # node = self.trie.search(word)
+        relevant_docs = []
+        print('word', word)
+        print('negate', negate)
+        if word in self.vocabulary_dict:
             if negate:
-                relevant_docs = [ i for i in self.documents if not i in node.frequency_by_document and node.frequency_by_document[i] == 0]
+                print('mira')
+                relevant_docs = [ i for i in self.documents if not i in self.vocabulary_dict[word]]
+                print(relevant_docs)
             else:
-                for i in self.documents:
-                    if i in node.frequency_by_document.keys() and node.frequency_by_document[i] > 0:
-                        relevant_docs.append(i)
-                        
-            return relevant_docs
+                relevant_docs = [ i for i in self.vocabulary_dict[word]]
+        else:
+            relevant_docs = [i for i in self.documents]
         
-        return []
+        return relevant_docs
+        
 
     def remove_duplicates(self, text):
         ''' removes duplicates from text'''
