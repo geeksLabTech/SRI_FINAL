@@ -10,6 +10,7 @@ class VectorialModel:
     def __init__(self, documents: dict[int, DocumentData], vocabulary_dict: dict[str, dict[int,int]]) -> None:
         self.documents = documents
         self.vocabulary_dict = vocabulary_dict
+        self.documents_vectors = self.create_documents_vectors()
         
     def get_weight_of_a_word_in_document(self, word_frequency_in_doc: int, doc_id: int, docs_with_word: int) -> float:
         max_freq = self.documents[doc_id].max_frequency_term
@@ -46,13 +47,12 @@ class VectorialModel:
         Returns a dict with the document id as key and the similarity with the query as value.
         The dict is sorted in descending order by the similarity.
         """
-        documents_vectors = self.create_documents_vectors()
         query_vector = self.create_query_vector(query, a)
         # print('query vector: ', np.count_nonzero(query_vector))
         documents_by_similarity: dict[int, float] = {}
 
-        for i in range(len(documents_vectors)):
-            similarity = np.dot(query_vector, documents_vectors[i]) / (np.linalg.norm(query_vector) * np.linalg.norm(documents_vectors[i]))
+        for i in range(len(self.documents_vectors)):
+            similarity = np.dot(query_vector, self.documents_vectors[i]) / (np.linalg.norm(query_vector) * np.linalg.norm(self.documents_vectors[i]))
             documents_by_similarity[i] = similarity
 
         sorted_documents = sorted(documents_by_similarity.items(), key=lambda x: x[1], reverse=True)
